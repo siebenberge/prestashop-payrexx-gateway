@@ -224,7 +224,7 @@ class Payrexx extends PaymentModule
     private function _postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
-            Configuration::updateValue('PAYREXX_LABEL', serialize(Tools::getValue('payrexx_label')));
+            Configuration::updateValue('PAYREXX_LABEL', Tools::getValue('payrexx_label'));
             Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
             Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
 //            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
@@ -236,7 +236,7 @@ class Payrexx extends PaymentModule
 //        $payIcons = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_options = new PaymentOption();
-        $action_text = $this->l('Pay by credit cards');
+        $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
         $this->context->smarty->assign(array(
             'path' => $this->_path,
         ));
