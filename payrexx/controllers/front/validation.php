@@ -39,6 +39,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             if ($response->getStatus() === 'confirmed') {
                 $payrexxModule->validateOrder($cart->id, Configuration::get('PS_OS_PAYMENT'), $total, 'Payrexx', null, array(), (int)$context->currency->id, false, $customer->secure_key);
 
+
                 Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$payrexxModule->id.'&key='.$customer->secure_key);
             } else {
                 Tools::redirect('index.php?controller=order&step=1');

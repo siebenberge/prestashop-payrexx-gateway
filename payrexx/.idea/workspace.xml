@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d75eec3d-bcff-4698-a883-6c9ca869b4d0" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.xml" afterPath="$PROJECT_DIR$/config.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/AuthTokenCreate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/AuthTokenCreate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayCreate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayCreate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayDelete.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayDelete.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayGetOne.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/GatewayGetOne.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceCreate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceCreate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceDelete.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceDelete.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceGetOne.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/InvoiceGetOne.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageCreate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageCreate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageGetAll.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageGetAll.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageGetOne.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/PageGetOne.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionCancel.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionCancel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionCreate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionCreate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionUpdate.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/examples/SubscriptionUpdate.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/CommunicationAdapter/AbstractCommunication.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/CommunicationAdapter/AbstractCommunication.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/CommunicationAdapter/CurlCommunication.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/CommunicationAdapter/CurlCommunication.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Communicator.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Communicator.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Base.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Base.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/AuthToken.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/AuthToken.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Gateway.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Gateway.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Invoice.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Invoice.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Page.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Page.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Subscription.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Request/Subscription.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/AuthToken.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/AuthToken.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Gateway.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Gateway.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Invoice.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Invoice.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Page.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Page.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Subscription.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Models/Response/Subscription.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Payrexx.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/Payrexx.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/PayrexxException.php" afterPath="$PROJECT_DIR$/controllers/front/payrexx-php-master/lib/Payrexx/PayrexxException.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/front/validation.php" afterPath="$PROJECT_DIR$/controllers/front/validation.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/payrexx.php" afterPath="$PROJECT_DIR$/payrexx.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/index.php" afterPath="$PROJECT_DIR$/views/index.php" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="x" value="433" />
+    <option name="y" value="73" />
+    <option name="width" value="1294" />
+    <option name="height" value="1407" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="payrexx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="payrexx" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d75eec3d-bcff-4698-a883-6c9ca869b4d0" name="Default" comment="" />
+      <created>1504162432637</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1504162432637</updated>
+      <workItem from="1504162433755" duration="37000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="37000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="433" y="73" width="1294" height="1407" extended-state="1" />
+    <layout>
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24960877" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34078643" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+</project>

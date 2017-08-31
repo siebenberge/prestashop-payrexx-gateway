@@ -8,15 +8,16 @@
  * @copyright  2017 Payrexx
  */
 
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-
 class Payrexx extends PaymentModule
 {
+
+    public $address;
+    public $extra_mail_vars;
+
     public function __construct()
     {
         $this->name = 'payrexx';
@@ -75,7 +76,10 @@ class Payrexx extends PaymentModule
      */
     private function registrationHook()
     {
-        if (!$this->registerHook('paymentOptions')) {
+        if (_PS_VERSION_ >= '1.7' && !$this->registerHook('paymentOptions')){
+            return false;
+        }
+        elseif (_PS_VERSION_ < '1.7' && !$this->registerHook('payment')){
             return false;
         }
 
@@ -231,11 +235,24 @@ class Payrexx extends PaymentModule
         }
     }
 
+    //Hook payment for version < 1.7
+    public function hookPayment($params)
+    {
+        $this->smarty->assign(array(
+            'payrexx_url' => $this->context->link->getModuleLink($this->name, 'payrexx'),
+            'image_path' => $this->_path,
+            'title' => $this->displayName
+        ));
+        return $this->display(__FILE__, 'payrexx_payment.tpl');
+
+    }
+
+    //payment hook for version >= 1.7
     public function hookPaymentOptions($params)
     {
 //        $payIcons = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
-        $payment_options = new PaymentOption();
+        $payment_options = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
         $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
         $this->context->smarty->assign(array(
             'path' => $this->_path,
@@ -248,6 +265,7 @@ class Payrexx extends PaymentModule
 
         return $payments_options;
     }
+
 
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
