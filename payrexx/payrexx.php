@@ -23,7 +23,7 @@ class Payrexx extends PaymentModule
     {
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.0';
+        $this->version = '1.0.0';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -247,7 +247,6 @@ class Payrexx extends PaymentModule
             'title' => $this->displayName
         ));
         return $this->display(__FILE__, 'payrexx_payment.tpl');
-
     }
 
     //payment hook for version >= 1.7
@@ -270,10 +269,17 @@ class Payrexx extends PaymentModule
     }
 
 
-    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown',
-                                  $message = null, $transaction = array(), $currency_special = null,
-                                  $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
-    {
+    public function validateOrder(
+        $id_cart,
+        $id_order_state,
+        $payment_method = 'Unknown',
+        $message = null,
+        $transaction = array(),
+        $currency_special = null,
+        $dont_touch_amount = false,
+        $secure_key = false,
+        Shop $shop = null
+    ) {
         $cart = new Cart((int)$id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
@@ -291,4 +297,3 @@ class Payrexx extends PaymentModule
         );
     }
 }
-

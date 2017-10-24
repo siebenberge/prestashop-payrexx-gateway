@@ -36,7 +36,7 @@ class CurlCommunication extends \Payrexx\CommunicationAdapter\AbstractCommunicat
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_USERAGENT => 'payrexx-php/1.0.0',
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_CAINFO => dirname(__DIR__) . '/certs/ca.pem',
+            CURLOPT_CAINFO => _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master/certs/ca.pem',
         );
         if (defined(PHP_QUERY_RFC3986)) {
             $paramString = http_build_query($params, null, '&', PHP_QUERY_RFC3986);

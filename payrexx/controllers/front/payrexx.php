@@ -27,7 +27,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $failedRedirectUrl = Tools::getShopDomain(true, true).'/index.php?controller=order&step=1';
 
         spl_autoload_register(function ($class) {
-            $root = __DIR__ . '/payrexx-php-master';
+            $root = _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master';
             $classFile = $root . '/lib/' . str_replace('\\', '/', $class) . '.php';
             if (file_exists($classFile)) {
                 require_once $classFile;
