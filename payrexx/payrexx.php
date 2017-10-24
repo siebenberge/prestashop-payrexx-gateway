@@ -6,6 +6,7 @@
  *
  * @author Payrexx <support@payrexx.com>
  * @copyright  2017 Payrexx
+ * @license MIT License
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -76,10 +77,9 @@ class Payrexx extends PaymentModule
      */
     private function registrationHook()
     {
-        if (_PS_VERSION_ >= '1.7' && !$this->registerHook('paymentOptions')){
+        if (_PS_VERSION_ >= '1.7' && !$this->registerHook('paymentOptions')) {
             return false;
-        }
-        elseif (_PS_VERSION_ < '1.7' && !$this->registerHook('payment')){
+        } elseif (_PS_VERSION_ < '1.7' && !$this->registerHook('payment')) {
             return false;
         }
 
@@ -121,7 +121,7 @@ class Payrexx extends PaymentModule
 
     public function getContent()
     {
-        $this->_postProcess();
+        $this->postProcess();
 
 //        $options = array(
 //            array('id_option' => 'masterpass', 'name' => 'Masterpass',),
@@ -133,7 +133,7 @@ class Payrexx extends PaymentModule
 //            array('id_option' => 'american_express', 'name' => 'American Express',),
 //            array('id_option' => 'paypal', 'name' => 'PayPal',),
 //            array('id_option' => 'bitcoin', 'name' => 'Bitcoin',),
-//            array('id_option' => 'sofortueberweisung_de', 'name' => 'Sofort Überweisung',),
+//            array('id_option' => 'sofortueberweisung_de', 'name' => 'Sofort Ueberweisung',),
 //            array('id_option' => 'airplus', 'name' => 'Airplus',),
 //            array('id_option' => 'billpay', 'name' => 'Billpay',),
 //            array('id_option' => 'bonuscard', 'name' => 'Bonus card',),
@@ -172,7 +172,10 @@ class Payrexx extends PaymentModule
                 ),
                 array(
                     'type' => 'text',
-                    'label' => $this->l('INSTANCE NAME') . "<br /><small style='color:#00f; font-weight:normal'>(INSTANCE NAME is a part of the url where you access your payrexx installation.    https://INSTANCE.payrexx.com)</small>",
+                    'label' => $this->l('INSTANCE NAME') .
+                        "<br /><small style='color:#00f; font-weight:normal'>
+                            (INSTANCE NAME is a part of the url where you access your payrexx installation. 
+                            https://INSTANCE.payrexx.com)</small>",
                     'name' => 'payrexx_instance_name',
                     'required' => true
                 ),
@@ -225,7 +228,7 @@ class Payrexx extends PaymentModule
         return $form;
     }
 
-    private function _postProcess()
+    private function postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
             Configuration::updateValue('PAYREXX_LABEL', Tools::getValue('payrexx_label'));
@@ -259,23 +262,25 @@ class Payrexx extends PaymentModule
         ));
         $payment_options->setCallToActionText($action_text);
         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
-        $payments_options = [
+        $payments_options = array(
             $payment_options,
-        ];
+        );
 
         return $payments_options;
     }
 
 
-    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
+    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown',
+                                  $message = null, $transaction = array(), $currency_special = null,
+                                  $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
-        $cart = new Cart((int) $id_cart);
+        $cart = new Cart((int)$id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
         parent::validateOrder(
-            (int) $id_cart,
-            (int) $id_order_state,
-            (float) $total_ps,
+            (int)$id_cart,
+            (int)$id_order_state,
+            (float)$total_ps,
             $payment_method,
             $message,
             $transaction,

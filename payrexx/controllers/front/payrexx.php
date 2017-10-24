@@ -1,4 +1,13 @@
 <?php
+/**
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author Payrexx <support@payrexx.com>
+ * @copyright  2017 Payrexx
+ * @license MIT License
+ */
 
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
@@ -39,21 +48,21 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
-        $gateway->setPsp([]);
+        $gateway->setPsp(array());
 
         $gateway->setReferenceId($cart->id);
 
-        $gateway->addField($type = 'title', $value = '');
-        $gateway->addField($type = 'forename', $value = $customer->firstname);
-        $gateway->addField($type = 'surname', $value = $customer->lastname);
-        $gateway->addField($type = 'company', $value = $customer->company);
-        $gateway->addField($type = 'street', $value = $address->address1);
-        $gateway->addField($type = 'postcode', $value = $address->postcode);
-        $gateway->addField($type = 'place', $value = $address->city);
-        $gateway->addField($type = 'country', $value = $address->country);
-        $gateway->addField($type = 'phone', $value = $address->phone);
-        $gateway->addField($type = 'email', $value = $customer->email);
-        $gateway->addField($type = 'custom_field_1', $value = $cart->id, $name = 'Prestashop ID');
+        $gateway->addField('title', '');
+        $gateway->addField('forename', $customer->firstname);
+        $gateway->addField('surname', $customer->lastname);
+        $gateway->addField('company', $customer->company);
+        $gateway->addField('street', $address->address1);
+        $gateway->addField('postcode', $address->postcode);
+        $gateway->addField('place', $address->city);
+        $gateway->addField('country', $address->country);
+        $gateway->addField('phone', $address->phone);
+        $gateway->addField('email', $customer->email);
+        $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
 
         try {
             $response = $payrexx->create($gateway);
