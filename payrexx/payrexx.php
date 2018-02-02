@@ -15,14 +15,11 @@ if (!defined('_PS_VERSION_')) {
 
 class Payrexx extends PaymentModule
 {
-
-    public $address;
-    public $extra_mail_vars;
-
     public function __construct()
     {
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
+        $this->module_key = '';
         $this->version = '1.0.0';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
@@ -266,34 +263,5 @@ class Payrexx extends PaymentModule
         );
 
         return $payments_options;
-    }
-
-
-    public function validateOrder(
-        $id_cart,
-        $id_order_state,
-        $payment_method = 'Unknown',
-        $message = null,
-        $transaction = array(),
-        $currency_special = null,
-        $dont_touch_amount = false,
-        $secure_key = false,
-        Shop $shop = null
-    ) {
-        $cart = new Cart((int)$id_cart);
-        $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-
-        parent::validateOrder(
-            (int)$id_cart,
-            (int)$id_order_state,
-            (float)$total_ps,
-            $payment_method,
-            $message,
-            $transaction,
-            $currency_special,
-            $dont_touch_amount,
-            $secure_key,
-            $shop
-        );
     }
 }
