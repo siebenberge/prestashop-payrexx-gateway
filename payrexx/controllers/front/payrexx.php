@@ -11,7 +11,7 @@
 
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
-    public $name = 'payrexx';
+    const MODULE_NAME = 'payrexx';
 
     public function postProcess()
     {
@@ -23,7 +23,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
         $currency = $context->currency->iso_code;
 
-        $successRedirectUrl = Context::getContext()->link->getModuleLink($this->name, 'validation', array(), true);
+        $successRedirectUrl = Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
         $failedRedirectUrl = Tools::getShopDomain(true, true).'/index.php?controller=order&step=1';
 
         spl_autoload_register(function ($class) {

@@ -11,18 +11,14 @@
 
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
-    public $name = 'payrexx';
-
     public function initContent()
     {
-        $context = Context::getContext();
-        $cart = $context->cart;
-        if (!isset($cart->id)) {
-            Tools::redirect('index.php');
-            exit();
+        $cart = $this->context->cart;
+        if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
+            Tools::redirect('index.php?controller=order&step=1');
         }
 
-        $gatewayId = $context->cookie->paymentId;
+        $gatewayId = $this->context->cookie->paymentId;
 
         spl_autoload_register(function ($class) {
             $root = _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master';
@@ -42,17 +38,21 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         $payrexxModule = Module::getInstanceByName('payrexx');
         $customer = new Customer($cart->id_customer);
 
+        if (!Validate::isLoadedObject($customer)) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+
         try {
             $response = $payrexx->getOne($gateway);
             if ($response->getStatus() === 'confirmed') {
                 $payrexxModule->validateOrder(
                     (int)$cart->id,
                     (int)Configuration::get('PS_OS_PAYMENT'),
-                    (float)$cart->getOrderTotal(true, Cart::BOTH),
+                    (float)$response->getAmount(),
                     'Payrexx',
                     null,
                     array(),
-                    (int)$context->currency->id,
+                    (int)$this->context->currency->id,
                     false,
                     $customer->secure_key
                 );
@@ -60,6 +60,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                 Tools::redirect(
                     'index.php?controller=order-confirmation&id_cart=' . $cart->id .
                     '&id_module=' . $payrexxModule->id .
+                    '&id_order='.$this->module->currentOrder.
                     '&key=' . $customer->secure_key
                 );
             } else {
