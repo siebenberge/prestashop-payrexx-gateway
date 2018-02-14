@@ -24,7 +24,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $currency = $context->currency->iso_code;
 
         $successRedirectUrl = Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
-        $failedRedirectUrl = Tools::getShopDomain(true, true).'/index.php?controller=order&step=1';
+        $failedRedirectUrl = Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1';
 
         spl_autoload_register(function ($class) {
             $root = _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master';

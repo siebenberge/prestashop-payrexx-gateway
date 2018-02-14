@@ -14,10 +14,6 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         $cart = $this->context->cart;
-        if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
-            Tools::redirect('index.php?controller=order&step=1');
-        }
-
         $gatewayId = $this->context->cookie->paymentId;
 
         spl_autoload_register(function ($class) {
@@ -32,9 +28,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         $secret = Configuration::get('PAYREXX_API_SECRET');
         $payrexx = new \Payrexx\Payrexx($instanceName, $secret);
         $gateway = new \Payrexx\Models\Request\Gateway();
-
         $gateway->setId($gatewayId);
-
         $payrexxModule = Module::getInstanceByName('payrexx');
         $customer = new Customer($cart->id_customer);
 
@@ -44,11 +38,17 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
         try {
             $response = $payrexx->getOne($gateway);
+
+            // Validate current cart
+            if ($response->getReferenceId() != $cart->id) {
+                Tools::redirect('index.php?controller=order&step=1');
+            }
+
             if ($response->getStatus() === 'confirmed') {
                 $payrexxModule->validateOrder(
                     (int)$cart->id,
                     (int)Configuration::get('PS_OS_PAYMENT'),
-                    (float)$response->getAmount(),
+                    (float)$response->getAmount() / 100,
                     'Payrexx',
                     null,
                     array(),
@@ -60,7 +60,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                 Tools::redirect(
                     'index.php?controller=order-confirmation&id_cart=' . $cart->id .
                     '&id_module=' . $payrexxModule->id .
-                    '&id_order='.$this->module->currentOrder.
+                    '&id_order=' . $this->module->currentOrder .
                     '&key=' . $customer->secure_key
                 );
             } else {
