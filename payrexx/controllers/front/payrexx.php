@@ -39,17 +39,16 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $payrexx = new \Payrexx\Payrexx($instanceName, $secret);
         $gateway = new \Payrexx\Models\Request\Gateway();
 
+        $currencyIsoCode = !empty($currency) ? $currency : 'USD';
+        $country = new Country($address->id_country);
+        $countryIsoCode = !empty($country->iso_code) ? $country->iso_code : '';
+
+
         $gateway->setAmount($total * 100);
-
-        if ($currency == "") {
-            $currency = "USD";
-        }
-        $gateway->setCurrency($currency);
-
+        $gateway->setCurrency($currencyIsoCode);
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
         $gateway->setPsp(array());
-
         $gateway->setReferenceId($cart->id);
 
         $gateway->addField('title', '');
@@ -59,7 +58,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->addField('street', $address->address1);
         $gateway->addField('postcode', $address->postcode);
         $gateway->addField('place', $address->city);
-        $gateway->addField('country', $address->country);
+        $gateway->addField('country', $countryIsoCode);
         $gateway->addField('phone', $address->phone);
         $gateway->addField('email', $customer->email);
         $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
