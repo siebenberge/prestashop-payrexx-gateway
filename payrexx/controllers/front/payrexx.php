@@ -40,9 +40,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway = new \Payrexx\Models\Request\Gateway();
 
         $currencyIsoCode = !empty($currency) ? $currency : 'USD';
-        $country = new Country($address->id_country);
-        $countryIsoCode = !empty($country->iso_code) ? $country->iso_code : '';
-
+        $iso = Country::getIsoById($address->id_country);
 
         $gateway->setAmount($total * 100);
         $gateway->setCurrency($currencyIsoCode);
@@ -58,7 +56,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->addField('street', $address->address1);
         $gateway->addField('postcode', $address->postcode);
         $gateway->addField('place', $address->city);
-        $gateway->addField('country', $countryIsoCode);
+        $gateway->addField('country', $iso);
         $gateway->addField('phone', $address->phone);
         $gateway->addField('email', $customer->email);
         $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
