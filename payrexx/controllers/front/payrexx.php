@@ -18,7 +18,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $context = Context::getContext();
         $cart = $context->cart;
 
-        $productNames = [];
+        $productNames = array();
         $products = $cart->getProducts();
         foreach ($products as $product) {
             $quantity = $product['cart_quantity'] > 1 ? $product['cart_quantity'] . 'x ' : '';
@@ -31,7 +31,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
         $currency = $context->currency->iso_code;
 
-        $successRedirectUrl = Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
+        $successRedirectUrl = Context::getContext()->link
+            ->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
         $failedRedirectUrl = Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1';
 
         spl_autoload_register(function ($class) {
@@ -55,7 +56,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->setCurrency($currencyIsoCode);
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
-        $gateway->setPsp([]);
+        $gateway->setPsp(array());
         $gateway->setReferenceId($cart->id);
 
         $gateway->addField('title', '');

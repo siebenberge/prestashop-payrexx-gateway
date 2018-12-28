@@ -235,7 +235,7 @@ class Payrexx extends PaymentModule
         }
     }
 
-    //Hook payment for version < 1.7
+    // Payment hook for version < 1.7
     public function hookPayment($params)
     {
         $this->smarty->assign(array(
@@ -246,7 +246,7 @@ class Payrexx extends PaymentModule
         return $this->display(__FILE__, 'payrexx_payment.tpl');
     }
 
-    //payment hook for version >= 1.7
+    // Payment hook for version >= 1.7
     public function hookPaymentOptions($params)
     {
 //        $payIcons = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
