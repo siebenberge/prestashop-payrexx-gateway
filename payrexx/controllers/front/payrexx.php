@@ -17,6 +17,14 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     {
         $context = Context::getContext();
         $cart = $context->cart;
+
+        $productNames = [];
+        $products = $cart->getProducts();
+        foreach ($products as $product) {
+            $quantity = $product['cart_quantity'] > 1 ? $product['cart_quantity'] . 'x ' : '';
+            $productNames[] = $quantity . $product['name'];
+        }
+
         $customer = $context->customer;
         $address = new Address($cart->id_address_delivery);
 
@@ -42,11 +50,12 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $currencyIsoCode = !empty($currency) ? $currency : 'USD';
         $iso = Country::getIsoById($address->id_country);
 
+        $gateway->setPurpose(implode(', ', $productNames));
         $gateway->setAmount($total * 100);
         $gateway->setCurrency($currencyIsoCode);
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
-        $gateway->setPsp(array());
+        $gateway->setPsp([]);
         $gateway->setReferenceId($cart->id);
 
         $gateway->addField('title', '');
