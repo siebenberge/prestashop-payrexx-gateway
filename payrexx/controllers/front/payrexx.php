@@ -58,6 +58,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
         $gateway->setPsp(array());
         $gateway->setReferenceId($cart->id);
+        $gateway->setSkipResultPage(true);
 
         $gateway->addField('title', '');
         $gateway->addField('forename', $customer->firstname);
