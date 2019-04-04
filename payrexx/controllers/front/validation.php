@@ -44,7 +44,10 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                 Tools::redirect('index.php?controller=order&step=1');
             }
 
-            if ($response->getStatus() === 'confirmed') {
+            $invoices = $response->getInvoices();
+            $invoice = $invoices ? end($invoices) : null;
+            $transaction = $invoice ? end($invoice['transactions']) : null;
+            if ($transaction && in_array($transaction['status'], ['confirmed', 'waiting'])) {
                 $payrexxModule->validateOrder(
                     (int)$cart->id,
                     (int)Configuration::get('PS_OS_PAYMENT'),
