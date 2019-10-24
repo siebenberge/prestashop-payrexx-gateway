@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.6';
+        $this->version = '1.0.7';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -51,6 +51,7 @@ class Payrexx extends PaymentModule
         if (!Configuration::updateValue('PAYREXX_LABEL', '')
             || !Configuration::updateValue('PAYREXX_API_SECRET', '')
             || !Configuration::updateValue('PAYREXX_INSTANCE_NAME', '')
+            || !Configuration::updateValue('PAYREXX_USE_MODAL', '')
             || !Configuration::updateValue('PAYREXX_PAY_ICONS', '')
         ) {
             return false;
@@ -89,6 +90,7 @@ class Payrexx extends PaymentModule
             'PAYREXX_LABEL',
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
+            'PAYREXX_USE_MODAL',
             'PAYREXX_PAY_ICONS',
         );
         foreach ($config as $var) {
@@ -176,6 +178,21 @@ class Payrexx extends PaymentModule
                     'name' => 'payrexx_instance_name',
                     'required' => true
                 ),
+                array(
+                    'type' => 'checkbox',
+                    'label' => $this->l('Use Modal Checkout'),
+                    'name' => 'payrexx',
+                    'values' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'use_modal',
+                                'val' => '1',
+                            )
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
 //                array(
 //                    'type' => 'select',
 //                    'label' => $this->l('Payment Icons'),
@@ -198,6 +215,7 @@ class Payrexx extends PaymentModule
             'payrexx_label' => Configuration::get('PAYREXX_LABEL'),
             'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
             'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
+            'payrexx_use_modal' => (bool)Configuration::get('PAYREXX_USE_MODAL'),
             'payrexx_pay_icons' => unserialize(Configuration::get('PAYREXX_PAY_ICONS')),
         );
         $helper = new HelperForm();
@@ -231,6 +249,7 @@ class Payrexx extends PaymentModule
             Configuration::updateValue('PAYREXX_LABEL', Tools::getValue('payrexx_label'));
             Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
             Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
+            Configuration::updateValue('PAYREXX_USE_MODAL', Tools::getValue('payrexx_use_modal'));
 //            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
         }
     }
@@ -258,6 +277,17 @@ class Payrexx extends PaymentModule
         ));
         $payment_options->setCallToActionText($action_text);
         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
+
+        if (!empty($_SESSION['payrexx_gateway_url'])) {
+            $payment_options->setAdditionalInformation('
+                <a id="payrexx-gateway-modal" style="display: none;" data-href="' . $_SESSION['payrexx_gateway_url'] . '"></a>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                <script src="https://media.payrexx.com/modal/v1/gateway.min.js"></script>
+                <script>jQuery(\'#payrexx-gateway-modal\').payrexxModal().click();</script>
+            ');
+            unset($_SESSION['payrexx_gateway_url']);
+        }
+
         $payments_options = array(
             $payment_options,
         );

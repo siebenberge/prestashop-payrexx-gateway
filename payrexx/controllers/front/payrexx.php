@@ -76,7 +76,17 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $response = $payrexx->create($gateway);
             $context->cookie->paymentId = $response->getId();
             $lang = Language::getIsoById($context->cookie->id_lang);
-            Tools::redirect('https://' . $instanceName . '.payrexx.com/' . $lang . '/?payment=' . $response->getHash());
+            $gatewayUrl = 'https://' . $instanceName . '.payrexx.com/' . $lang . '/?payment=' . $response->getHash();
+
+            if ((bool)Configuration::get('PAYREXX_USE_MODAL')) {
+                if (empty($_SESSION)) {
+                    session_start();
+                }
+                $_SESSION['payrexx_gateway_url'] = $gatewayUrl;
+                Tools::redirect('index.php?controller=order&step=1');
+            } else {
+                Tools::redirect($gatewayUrl);
+            }
         } catch (\Payrexx\PayrexxException $e) {
             Tools::redirect('index.php?controller=order&step=1');
         }
