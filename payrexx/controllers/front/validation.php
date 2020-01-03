@@ -41,7 +41,26 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
             // Validate current cart
             if ($response->getReferenceId() != $cart->id) {
-                Tools::redirect('index.php?controller=order&step=1');
+                $currentStatus = (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                    SELECT o.current_state
+                    FROM ' . _DB_PREFIX_ . 'cart as c
+                    INNER JOIN ' . _DB_PREFIX_ . 'orders as o
+                        ON c.id_cart=o.id_cart 
+                    WHERE o.id_cart =' . $response->getReferenceId());
+                $fopen = fopen(_PS_ROOT_DIR_ . '/log/debug.log', 'w+');
+                if ($currentStatus == 2) {
+                    fwrite($fopen, $payrexxModule->id);
+                    fwrite($fopen, $this->module->currentOrder);
+                    fwrite($fopen, $customer->secure_key);
+                    Tools::redirect(
+                        'index.php?controller=order-confirmation&id_cart=' . $response->getReferenceId() .
+                        '&id_module=' . $payrexxModule->id .
+                        '&id_order=' . $this->module->currentOrder .
+                        '&key=' . $customer->secure_key
+                    );
+                } else {
+                    Tools::redirect('index.php?controller=order&step=1');
+                }
             }
 
             $invoices = $response->getInvoices();

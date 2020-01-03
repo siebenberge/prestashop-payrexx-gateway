@@ -20,11 +20,11 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.7';
+        $this->version = '1.0.8';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
-        $this->controllers = array('payment', 'validation');
+        $this->controllers = array('payment', 'validation', 'gateway');
 
         parent::__construct();
 
@@ -66,7 +66,9 @@ class Payrexx extends PaymentModule
      */
     private function installSQL()
     {
-        return true;
+        return Db::getInstance()->execute('
+            ALTER TABLE ' . _DB_PREFIX_ . 'cart
+            ADD COLUMN id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL AFTER id_guest');
     }
 
     /**
@@ -115,7 +117,8 @@ class Payrexx extends PaymentModule
      */
     private function uninstallSQL()
     {
-        return true;
+        return Db::getInstance()->execute('
+            ALTER TABLE ' . _DB_PREFIX_ . 'cart DROP COLUMN id_gateway');
     }
 
     public function getContent()
