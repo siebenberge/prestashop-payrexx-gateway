@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
  * versions in the future. If you wish to customize PrestaShop for your
@@ -99,7 +98,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT id_gateway FROM ' . _DB_PREFIX_ . 'cart
+            SELECT id_gateway FROM ' . _DB_PREFIX_ . 'payrexx_gateway
             WHERE id_cart = ' . $id_cart);
     }
 }

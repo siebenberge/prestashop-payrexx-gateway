@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.8';
+        $this->version = '1.0.9';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -36,15 +36,7 @@ class Payrexx extends PaymentModule
     public function install()
     {
         // Install default
-        if (!parent::install()) {
-            return false;
-        }
-        // install DataBase
-        if (!$this->installSQL()) {
-            return false;
-        }
-        // Registration hook
-        if (!$this->registrationHook()) {
+        if (!parent::install() || !$this->installDb() || !$this->registrationHook()) {
             return false;
         }
 
@@ -64,11 +56,15 @@ class Payrexx extends PaymentModule
      * Install DataBase table
      * @return boolean if install was successfull
      */
-    private function installSQL()
+    private function installDb()
     {
-        return Db::getInstance()->execute('
-            ALTER TABLE ' . _DB_PREFIX_ . 'cart
-            ADD COLUMN id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL AFTER id_guest');
+         return Db::getInstance()->execute('
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
+                id_cart INT(11) NOT NULL UNIQUE,
+                id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
+                PRIMARY KEY (`id_cart`)
+            ) DEFAULT CHARSET=utf8');
+         
     }
 
     /**
@@ -79,7 +75,10 @@ class Payrexx extends PaymentModule
     {
         if (_PS_VERSION_ >= '1.7' && !$this->registerHook('paymentOptions')) {
             return false;
-        } elseif (_PS_VERSION_ < '1.7' && !$this->registerHook('payment')) {
+        } elseif (
+            _PS_VERSION_ < '1.7' &&
+            (!$this->registerHook('payment') || !$this->registerHook('paymentReturn'))
+        ) {
             return false;
         }
 
@@ -117,8 +116,7 @@ class Payrexx extends PaymentModule
      */
     private function uninstallSQL()
     {
-        return Db::getInstance()->execute('
-            ALTER TABLE ' . _DB_PREFIX_ . 'cart DROP COLUMN id_gateway');
+        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'payrexx_gateway`');
     }
 
     public function getContent()
@@ -255,6 +253,35 @@ class Payrexx extends PaymentModule
             Configuration::updateValue('PAYREXX_USE_MODAL', Tools::getValue('payrexx_use_modal'));
 //            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
         }
+    }
+
+    // Payment hook for version < 1.7
+    public function hookPaymentReturn($params)
+    {
+        // By default Prestashop v1.6 will display the order confirmation message for the guest users
+        if ($this->context->customer->is_guest) {
+            return;
+        }
+
+        $invoice_url = null;
+        if ($params['objOrder'] && !empty($params['objOrder']->id)) {
+            $invoice_url = $this->context->link->getPageLink(
+                'pdf-invoice',
+                true,
+                $this->context->language->id,
+                "id_order={$params['objOrder']->id}"
+            );
+        }
+        $customer_email = null;
+        if ($params['cart'] && !empty($params['cart']->id_customer)) {
+            $customer = new Customer($params['cart']->id_customer);
+            $customer_email = $customer->email;
+        }
+        $this->smarty->assign(array(
+            'invoice_url' => $invoice_url,
+            'customer_email' => $customer_email,
+        ));
+        return $this->display(__FILE__, 'confirmation.tpl');
     }
 
     // Payment hook for version < 1.7

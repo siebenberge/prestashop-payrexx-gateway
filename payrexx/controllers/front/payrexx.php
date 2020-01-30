@@ -75,7 +75,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         try {
             $response = $payrexx->create($gateway);
             $context->cookie->paymentId = $response->getId();
-            static::updateCartGatewayId($cart->id, $response->getId());
+            static::insertCartGatewayId($cart->id, $response->getId());
             $lang = Language::getIsoById($context->cookie->id_lang);
             $gatewayUrl = 'https://' . $instanceName . '.payrexx.com/' . $lang . '/?payment=' . $response->getHash();
 
@@ -94,20 +94,22 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Update Gateway id
+     * Insert Gateway id
      *
-     * @param int $id_cart cart id
+     * @param int $id_cart    cart id
      * @param int $id_gateway gateway id
      * @return boolean
      */
-    public static function updateCartGatewayId($id_cart, $id_gateway)
+    public static function insertCartGatewayId($id_cart, $id_gateway)
     {
         if (empty($id_cart) || empty($id_gateway)) {
             return false;
         }
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
-            UPDATE ' . _DB_PREFIX_ . 'cart SET id_gateway = ' . $id_gateway .
-            ' WHERE id_cart = ' . $id_cart);
+            INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`)
+            VALUES (' . $id_cart . ',' . $id_gateway . ')'
+            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . $id_gateway . '
+        ');
     }
 }
