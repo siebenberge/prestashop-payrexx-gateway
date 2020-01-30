@@ -34,7 +34,8 @@ class Payrexx extends PaymentModule
         $this->validateDb();
     }
 
-    private function validateDb() {
+    private function validateDb()
+    {
         Db::getInstance()->execute('
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
                 id_cart INT(11) NOT NULL UNIQUE,
@@ -43,7 +44,6 @@ class Payrexx extends PaymentModule
             ) DEFAULT CHARSET=utf8');
         Db::getInstance()->execute('
             ALTER TABLE ' . _DB_PREFIX_ . 'cart DROP COLUMN id_gateway');
-
     }
 
     public function install()
@@ -77,7 +77,6 @@ class Payrexx extends PaymentModule
                 id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
                 PRIMARY KEY (`id_cart`)
             ) DEFAULT CHARSET=utf8');
-         
     }
 
     /**
@@ -88,10 +87,8 @@ class Payrexx extends PaymentModule
     {
         if (_PS_VERSION_ >= '1.7' && !$this->registerHook('paymentOptions')) {
             return false;
-        } elseif (
-            _PS_VERSION_ < '1.7' &&
-            (!$this->registerHook('payment') || !$this->registerHook('paymentReturn'))
-        ) {
+        } elseif (_PS_VERSION_ < '1.7' &&
+            (!$this->registerHook('payment') || !$this->registerHook('paymentReturn'))) {
             return false;
         }
 
@@ -321,14 +318,14 @@ class Payrexx extends PaymentModule
         $payment_options->setCallToActionText($action_text);
         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
 
-        if (!empty($_SESSION['payrexx_gateway_url'])) {
+        if (!empty($this->context->cookie->payrexx_gateway_url)) {
             $payment_options->setAdditionalInformation('
-                <a id="payrexx-gateway-modal" style="display: none;" data-href="' . $_SESSION['payrexx_gateway_url'] . '"></a>
+                <a id="payrexx-gateway-modal" style="display: none;" data-href="' . $this->context->cookie->payrexx_gateway_url . '"></a>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
                 <script src="https://media.payrexx.com/modal/v1/gateway.min.js"></script>
                 <script>jQuery(\'#payrexx-gateway-modal\').payrexxModal().click();</script>
             ');
-            unset($_SESSION['payrexx_gateway_url']);
+            $this->context->cookie->payrexx_gateway_url = null;
         }
 
         $payments_options = array(
