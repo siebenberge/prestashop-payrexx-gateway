@@ -31,6 +31,19 @@ class Payrexx extends PaymentModule
         $this->displayName = $this->l('Payrexx');
         $this->description = $this->l('Accept payments using Payrexx Payment gateway');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        $this->validateDb();
+    }
+
+    private function validateDb() {
+        Db::getInstance()->execute('
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
+                id_cart INT(11) NOT NULL UNIQUE,
+                id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
+                PRIMARY KEY (`id_cart`)
+            ) DEFAULT CHARSET=utf8');
+        Db::getInstance()->execute('
+            ALTER TABLE ' . _DB_PREFIX_ . 'cart DROP COLUMN id_gateway');
+
     }
 
     public function install()
@@ -99,7 +112,7 @@ class Payrexx extends PaymentModule
         }
 
         //Uninstall DataBase
-        if (!$this->uninstallSQL()) {
+        if (!$this->uninstallDb()) {
             return false;
         }
 
@@ -114,7 +127,7 @@ class Payrexx extends PaymentModule
      * Uninstall DataBase table
      * @return boolean if install was successfull
      */
-    private function uninstallSQL()
+    private function uninstallDb()
     {
         return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'payrexx_gateway`');
     }
