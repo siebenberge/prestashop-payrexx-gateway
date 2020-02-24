@@ -30,7 +30,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $cart = new Cart((int)$id_cart);
         $customer = new Customer($cart->id_customer);
         if (!in_array($status, array('confirmed', 'waiting'))) {
-            return;
+            die;
         }
 
         try {
@@ -48,7 +48,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         } catch (PrestaShopException $e) {
             PrestaShopLoggerCore::addLog('CART ID: ' . $id_cart . ' - ' . $e->getMessage());
         }
-        die();
+        die;
     }
 
     /**
