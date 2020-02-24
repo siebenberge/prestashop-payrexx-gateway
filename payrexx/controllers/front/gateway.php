@@ -11,27 +11,25 @@
 
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
+
     public function initContent()
     {
         $transaction = Tools::getValue('transaction');
         $id_cart = $transaction['invoice']['referenceId'];
 
         if (empty($id_cart) || !isset($transaction['status'])) {
-            return;
+            die;
         }
 
         $gateway = $this->getPayrexxGateway((int)$id_cart);
         $status = $gateway->getStatus();
-        if (empty($status) || $status !== $transaction['status']) {
-            return;
+        if (empty($status) || $status !== $transaction['status'] || !in_array($status, ['confirmed', 'waiting'])) {
+            die;
         }
 
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart((int)$id_cart);
         $customer = new Customer($cart->id_customer);
-        if (!in_array($status, array('confirmed', 'waiting'))) {
-            die;
-        }
 
         try {
             $payrexxModule->validateOrder(
@@ -48,7 +46,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         } catch (PrestaShopException $e) {
             PrestaShopLoggerCore::addLog('CART ID: ' . $id_cart . ' - ' . $e->getMessage());
         }
-        die;
+        die();
     }
 
     /**
@@ -98,7 +96,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT id_gateway FROM ' . _DB_PREFIX_ . 'payrexx_gateway
+            SELECT id_gateway FROM ' . _DB_PREFIX_ . 'cart
             WHERE id_cart = ' . $id_cart);
     }
 }
