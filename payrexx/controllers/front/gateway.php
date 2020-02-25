@@ -22,6 +22,10 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         $gateway = $this->getPayrexxGateway((int)$id_cart);
+        if (!$gateway) {
+            PrestaShopLoggerCore::addLog('GATEWAY FOR CART ID: ' . $id_cart . ' NOT FOUND');
+        }
+
         $status = $gateway->getStatus();
         if (empty($status) || $status !== $transaction['status'] || !in_array($status, ['confirmed', 'waiting'])) {
             die;
@@ -30,6 +34,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart((int)$id_cart);
         $customer = new Customer($cart->id_customer);
+
 
         try {
             $payrexxModule->validateOrder(
@@ -96,7 +101,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT id_gateway FROM ' . _DB_PREFIX_ . 'cart
+            SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_cart = ' . $id_cart);
     }
 }
