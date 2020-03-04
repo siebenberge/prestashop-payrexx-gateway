@@ -33,9 +33,11 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
 
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart((int)$id_cart);
+        if (Validate::isLoadedObject($cart) && $cart->OrderExists()) {
+            die();
+        }
+
         $customer = new Customer($cart->id_customer);
-
-
         try {
             $payrexxModule->validateOrder(
                 (int)$id_cart,
