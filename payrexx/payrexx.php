@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.12';
+        $this->version = '1.0.13';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -54,6 +54,7 @@ class Payrexx extends PaymentModule
         }
 
         if (!Configuration::updateValue('PAYREXX_LABEL', '')
+            || !Configuration::updateValue('PAYREXX_DESCRIPTION', '')
             || !Configuration::updateValue('PAYREXX_API_SECRET', '')
             || !Configuration::updateValue('PAYREXX_INSTANCE_NAME', '')
             || !Configuration::updateValue('PAYREXX_USE_MODAL', '')
@@ -71,7 +72,7 @@ class Payrexx extends PaymentModule
      */
     private function installDb()
     {
-         return Db::getInstance()->execute('
+        return Db::getInstance()->execute('
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
                 id_cart INT(11) NOT NULL UNIQUE,
                 id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
@@ -99,6 +100,7 @@ class Payrexx extends PaymentModule
     {
         $config = array(
             'PAYREXX_LABEL',
+            'PAYREXX_DESCRIPTION',
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
             'PAYREXX_USE_MODAL',
@@ -133,35 +135,39 @@ class Payrexx extends PaymentModule
     {
         $this->postProcess();
 
-//        $options = array(
-//            array('id_option' => 'masterpass', 'name' => 'Masterpass',),
-//            array('id_option' => 'mastercard', 'name' => 'Mastercard',),
-//            array('id_option' => 'visa', 'name' => 'Visa',),
-//            array('id_option' => 'apple_pay', 'name' => 'Apple Pay',),
-//            array('id_option' => 'maestro', 'name' => 'Maestro',),
-//            array('id_option' => 'jcb', 'name' => 'JCB',),
-//            array('id_option' => 'american_express', 'name' => 'American Express',),
-//            array('id_option' => 'paypal', 'name' => 'PayPal',),
-//            array('id_option' => 'bitcoin', 'name' => 'Bitcoin',),
-//            array('id_option' => 'sofortueberweisung_de', 'name' => 'Sofort Ueberweisung',),
-//            array('id_option' => 'airplus', 'name' => 'Airplus',),
-//            array('id_option' => 'billpay', 'name' => 'Billpay',),
-//            array('id_option' => 'bonuscard', 'name' => 'Bonus card',),
-//            array('id_option' => 'cashu', 'name' => 'CashU',),
-//            array('id_option' => 'cb', 'name' => 'Carte Bleue',),
-//            array('id_option' => 'diners_club', 'name' => 'Diners Club',),
-//            array('id_option' => 'direct_debit', 'name' => 'Direct Debit',),
-//            array('id_option' => 'discover', 'name' => 'Discover',),
-//            array('id_option' => 'elv', 'name' => 'ELV',),
-//            array('id_option' => 'ideal', 'name' => 'iDEAL',),
-//            array('id_option' => 'invoice', 'name' => 'Invoice',),
-//            array('id_option' => 'myone', 'name' => 'My One',),
-//            array('id_option' => 'paysafecard', 'name' => 'Paysafe Card',),
-//            array('id_option' => 'postfinance_card', 'name' => 'PostFinance Card',),
-//            array('id_option' => 'postfinance_efinance', 'name' => 'PostFinance E-Finance',),
-//            array('id_option' => 'swissbilling', 'name' => 'SwissBilling',),
-//            array('id_option' => 'twint', 'name' => 'TWINT'),
-//        );
+        $options = array(
+            array('id_option' => 'masterpass', 'name' => 'Masterpass',),
+            array('id_option' => 'mastercard', 'name' => 'Mastercard',),
+            array('id_option' => 'visa', 'name' => 'Visa',),
+            array('id_option' => 'apple_pay', 'name' => 'Apple Pay',),
+            array('id_option' => 'maestro', 'name' => 'Maestro',),
+            array('id_option' => 'jcb', 'name' => 'JCB',),
+            array('id_option' => 'american_express', 'name' => 'American Express',),
+            array('id_option' => 'paypal', 'name' => 'PayPal',),
+            array('id_option' => 'bitcoin', 'name' => 'Bitcoin',),
+            array('id_option' => 'sofortueberweisung_de', 'name' => 'Sofort Ueberweisung',),
+            array('id_option' => 'airplus', 'name' => 'Airplus',),
+            array('id_option' => 'billpay', 'name' => 'Billpay',),
+            array('id_option' => 'bonuscard', 'name' => 'Bonus card',),
+            array('id_option' => 'cashu', 'name' => 'CashU',),
+            array('id_option' => 'cb', 'name' => 'Carte Bleue',),
+            array('id_option' => 'diners_club', 'name' => 'Diners Club',),
+            array('id_option' => 'direct_debit', 'name' => 'Direct Debit',),
+            array('id_option' => 'discover', 'name' => 'Discover',),
+            array('id_option' => 'elv', 'name' => 'ELV',),
+            array('id_option' => 'ideal', 'name' => 'iDEAL',),
+            array('id_option' => 'invoice', 'name' => 'Invoice',),
+            array('id_option' => 'myone', 'name' => 'My One',),
+            array('id_option' => 'paysafecard', 'name' => 'Paysafe Card',),
+            array('id_option' => 'postfinance_card', 'name' => 'PostFinance Card',),
+            array('id_option' => 'postfinance_efinance', 'name' => 'PostFinance E-Finance',),
+            array('id_option' => 'swissbilling', 'name' => 'SwissBilling',),
+            array('id_option' => 'twint', 'name' => 'TWINT'),
+            array('id_option' => 'bancontact', 'name' => 'Bancontact'),
+            array('id_option' => 'giropay', 'name' => 'GiroPay'),
+            array('id_option' => 'eps', 'name' => 'EPS'),
+        );
+
         $fields_form = array();
         $fields_form[0]['form'] = array(
             'legend' => array(
@@ -172,6 +178,12 @@ class Payrexx extends PaymentModule
                     'type' => 'text',
                     'label' => $this->l('Title'),
                     'name' => 'payrexx_label',
+                    'required' => true
+                ),
+                array(
+                    'type' => 'textarea',
+                    'label' => $this->l('Description'),
+                    'name' => 'payrexx_description',
                     'required' => true
                 ),
                 array(
@@ -204,17 +216,17 @@ class Payrexx extends PaymentModule
                         'name' => 'name'
                     )
                 ),
-//                array(
-//                    'type' => 'select',
-//                    'label' => $this->l('Payment Icons'),
-//                    'name' => 'payrexx_pay_icons',
-//                    'multiple' => true,
-//                    'options' => array(
-//                        'query' => $options,
-//                        'id' => 'id_option',
-//                        'name' => 'name'
-//                    )
-//                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Payment Icons'),
+                    'name' => 'payrexx_pay_icons',
+                    'multiple' => true,
+                    'options' => array(
+                        'query' => $options,
+                        'id' => 'id_option',
+                        'name' => 'name'
+                    )
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -224,6 +236,7 @@ class Payrexx extends PaymentModule
 
         $fields_value = array(
             'payrexx_label' => Configuration::get('PAYREXX_LABEL'),
+            'payrexx_description' => Configuration::get('PAYREXX_DESCRIPTION'),
             'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
             'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
             'payrexx_use_modal' => (bool)Configuration::get('PAYREXX_USE_MODAL'),
@@ -258,10 +271,11 @@ class Payrexx extends PaymentModule
     {
         if (Tools::isSubmit('payrexx_config')) {
             Configuration::updateValue('PAYREXX_LABEL', Tools::getValue('payrexx_label'));
+            Configuration::updateValue('PAYREXX_DESCRIPTION', Tools::getValue('payrexx_description'));
             Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
             Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
             Configuration::updateValue('PAYREXX_USE_MODAL', Tools::getValue('payrexx_use_modal'));
-//            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
+            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
         }
     }
 
@@ -308,30 +322,40 @@ class Payrexx extends PaymentModule
     // Payment hook for version >= 1.7
     public function hookPaymentOptions($params)
     {
-//        $payIcons = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
+        $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
-        $payment_options = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+        $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
         $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
         $this->context->smarty->assign(array(
             'path' => $this->_path,
         ));
-        $payment_options->setCallToActionText($action_text);
-        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
+        $payment_option->setCallToActionText($action_text);
+        $payment_option->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
 
         if (!empty($this->context->cookie->payrexx_gateway_url)) {
-            $payment_options->setAdditionalInformation('
+            $additionalModalCode = '
                 <a id="payrexx-gateway-modal" style="display: none;" data-href="' . $this->context->cookie->payrexx_gateway_url . '"></a>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
                 <script src="https://media.payrexx.com/modal/v1/gateway.min.js"></script>
                 <script>jQuery(\'#payrexx-gateway-modal\').payrexxModal().click();</script>
-            ');
+            ';
             $this->context->cookie->payrexx_gateway_url = null;
         }
 
-        $payments_options = array(
-            $payment_options,
+        $payIcons = '';
+        foreach ($payIconSource as $iconSource) {
+            $payIcons .= '<img style="width: 50px" src="' . $this->_path . 'views/img/cardicons/card_' . $iconSource . '.svg" />';
+        }
+
+        $payment_option->setAdditionalInformation(
+            Configuration::get('PAYREXX_DESCRIPTION') .
+            $additionalModalCode .
+            '<div class="payrexxPayIcons">' . $payIcons . '</div>');
+
+        $payment_options = array(
+            $payment_option,
         );
 
-        return $payments_options;
+        return $payment_options;
     }
 }
