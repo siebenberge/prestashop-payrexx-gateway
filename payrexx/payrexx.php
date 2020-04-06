@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.13';
+        $this->version = '1.0.14';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -42,8 +42,6 @@ class Payrexx extends PaymentModule
                 id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
                 PRIMARY KEY (`id_cart`)
             ) DEFAULT CHARSET=utf8');
-        Db::getInstance()->execute('
-            ALTER TABLE ' . _DB_PREFIX_ . 'cart DROP COLUMN id_gateway');
     }
 
     public function install()
