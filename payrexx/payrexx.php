@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.14';
+        $this->version = '1.0.15';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -141,6 +141,7 @@ class Payrexx extends PaymentModule
             array('id_option' => 'maestro', 'name' => 'Maestro',),
             array('id_option' => 'jcb', 'name' => 'JCB',),
             array('id_option' => 'american_express', 'name' => 'American Express',),
+            array('id_option' => 'wirpay', 'name' => 'WIRpay',),
             array('id_option' => 'paypal', 'name' => 'PayPal',),
             array('id_option' => 'bitcoin', 'name' => 'Bitcoin',),
             array('id_option' => 'sofortueberweisung_de', 'name' => 'Sofort Ueberweisung',),
@@ -161,9 +162,11 @@ class Payrexx extends PaymentModule
             array('id_option' => 'postfinance_efinance', 'name' => 'PostFinance E-Finance',),
             array('id_option' => 'swissbilling', 'name' => 'SwissBilling',),
             array('id_option' => 'twint', 'name' => 'TWINT'),
+            array('id_option' => 'barzahlen', 'name' => 'Barzahlen/Viacash'),
             array('id_option' => 'bancontact', 'name' => 'Bancontact'),
             array('id_option' => 'giropay', 'name' => 'GiroPay'),
             array('id_option' => 'eps', 'name' => 'EPS'),
+            array('id_option' => 'google_pay', 'name' => 'Google Pay'),
         );
 
         $fields_form = array();
@@ -222,7 +225,7 @@ class Payrexx extends PaymentModule
                     'options' => array(
                         'query' => $options,
                         'id' => 'id_option',
-                        'name' => 'name'
+                        'name' => 'name',
                     )
                 ),
             ),
@@ -238,7 +241,7 @@ class Payrexx extends PaymentModule
             'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
             'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
             'payrexx_use_modal' => (bool)Configuration::get('PAYREXX_USE_MODAL'),
-            'payrexx_pay_icons' => unserialize(Configuration::get('PAYREXX_PAY_ICONS')),
+            'payrexx_pay_icons[]' => unserialize(Configuration::get('PAYREXX_PAY_ICONS')),
         );
         $helper = new HelperForm();
         $helper->module = $this;
