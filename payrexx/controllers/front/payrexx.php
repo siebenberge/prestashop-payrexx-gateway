@@ -73,6 +73,16 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
 
         try {
+            if ($gatewayId = static::getGatewayIdByForCartId($cart->id)) {
+                $oldGateway = new \Payrexx\Models\Request\Gateway();
+                $oldGateway->setId($gatewayId);
+
+                try {
+                    $payrexx->delete($oldGateway);
+                } catch (\Payrexx\PayrexxException $e) {
+                }
+            }
+
             $response = $payrexx->create($gateway);
             $context->cookie->paymentId = $response->getId();
             static::insertCartGatewayId($cart->id, $response->getId());
@@ -108,5 +118,22 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             VALUES (' . $id_cart . ',' . $id_gateway . ')'
             . 'ON DUPLICATE KEY UPDATE id_gateway = ' . $id_gateway . '
         ');
+    }
+
+    /**
+     * Check if Gateway already exists for Cart id
+     *
+     * @param int $id_cart    cart id
+     * @return int
+     */
+    public static function getGatewayIdByForCartId($id_cart)
+    {
+        if (empty($id_cart)) {
+            return null;
+        }
+
+        return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
+            WHERE id_cart = ' . $id_cart);
     }
 }
