@@ -115,8 +115,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
             INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`)
-            VALUES (' . $id_cart . ',' . $id_gateway . ')'
-            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . $id_gateway . '
+            VALUES (' . (int)$id_cart . ',' . (int)$id_gateway . ')'
+            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int)$id_gateway . '
         ');
     }
 
@@ -134,6 +134,6 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
-            WHERE id_cart = ' . $id_cart);
+            WHERE id_cart = ' . (int)$id_cart);
     }
 }

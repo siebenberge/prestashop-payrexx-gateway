@@ -104,6 +104,6 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
 
         return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
-            WHERE id_cart = ' . $id_cart);
+            WHERE id_cart = ' . (int)$id_cart);
     }
 }

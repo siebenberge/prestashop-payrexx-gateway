@@ -46,7 +46,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                     FROM ' . _DB_PREFIX_ . 'cart as c
                     INNER JOIN ' . _DB_PREFIX_ . 'orders as o
                         ON c.id_cart=o.id_cart 
-                    WHERE o.id_cart =' . $response->getReferenceId());
+                    WHERE o.id_cart =' . (int)$response->getReferenceId());
                 if (!empty($result) && $result['current_state'] == 2) {
                     Tools::redirect(
                         'index.php?controller=order-confirmation&id_cart=' . $response->getReferenceId() .
