@@ -312,10 +312,11 @@ class Payrexx extends PaymentModule
     // Payment hook for version < 1.7
     public function hookPayment($params)
     {
+        $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
         $this->smarty->assign(array(
             'payrexx_url' => $this->context->link->getModuleLink($this->name, 'payrexx'),
             'image_path' => $this->_path,
-            'title' => $this->displayName
+            'title' => $action_text,
         ));
         return $this->display(__FILE__, 'payrexx_payment.tpl');
     }
