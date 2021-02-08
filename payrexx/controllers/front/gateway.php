@@ -47,7 +47,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
 
         try {
             $prestaStatus = null;
-            switch($transaction['status']) {
+            switch ($transaction['status']) {
                 case \Payrexx\Models\Response\Transaction::CONFIRMED:
                     $prestaStatus = 'PS_OS_PAYMENT';
                     return;
@@ -80,9 +80,10 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         die();
     }
 
-    private function handleOrderStatusUpdate($transactionStatus, $cartId){
+    private function handleOrderStatusUpdate($transactionStatus, $cartId)
+    {
         $prestaStatus = null;
-        switch($transactionStatus) {
+        switch ($transactionStatus) {
             case \Payrexx\Models\Response\Transaction::ERROR:
             case \Payrexx\Models\Response\Transaction::CANCELLED:
             case \Payrexx\Models\Response\Transaction::EXPIRED:
