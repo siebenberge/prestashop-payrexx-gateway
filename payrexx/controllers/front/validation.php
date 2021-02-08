@@ -63,9 +63,18 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             $invoice = $invoices ? end($invoices) : null;
             $transaction = $invoice ? end($invoice['transactions']) : null;
             if ($transaction && in_array($transaction['status'], array('confirmed', 'waiting'))) {
+                switch($transaction['status']) {
+                    case \Payrexx\Models\Response\Transaction::CONFIRMED:
+                        $prestaStatus = 'PS_OS_PAYMENT';
+                        break;
+                    case \Payrexx\Models\Response\Transaction::WAITING:
+                        $prestaStatus = 'PS_OS_BANKWIRE';
+                        break;
+                }
+
                 $payrexxModule->validateOrder(
                     (int)$cart->id,
-                    (int)Configuration::get('PS_OS_PAYMENT'),
+                    (int)Configuration::get($prestaStatus),
                     (float)$response->getAmount() / 100,
                     'Payrexx',
                     null,

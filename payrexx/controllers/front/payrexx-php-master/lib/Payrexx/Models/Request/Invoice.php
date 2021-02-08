@@ -24,10 +24,22 @@ class Invoice extends \Payrexx\Models\Base
     protected $description = '';
     protected $psp = 0;
 
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     array
+     */
+    protected $pm;
+
     // optional
     protected $name = '';
     protected $purpose = '';
+    protected $buttonText = '';
     protected $amount = 0;
+    protected $vatRate = null;
+    protected $sku = '';
     protected $currency = '';
     protected $preAuthorization = false;
     protected $reservation = false;
@@ -42,6 +54,9 @@ class Invoice extends \Payrexx\Models\Base
     protected $subscriptionCancellationInterval = '';
     protected $fields = array();
     protected $concardisOrderId = '';
+
+    /** @var string $expirationDate */
+    protected $expirationDate;
 
     /**
      * @return string
@@ -120,6 +135,26 @@ class Invoice extends \Payrexx\Models\Base
     }
 
     /**
+     * @access  public
+     * @return  array
+     */
+    public function getPm()
+    {
+        return $this->pm;
+    }
+
+    /**
+     * Set payment mean to use.
+     *
+     * @access  public
+     * @param   array   $pm
+     */
+    public function setPm($pm)
+    {
+        $this->pm = $pm;
+    }
+
+    /**
      * @return string
      */
     public function getName()
@@ -158,6 +193,22 @@ class Invoice extends \Payrexx\Models\Base
     }
 
     /**
+     * @return string
+     */
+    public function getButtonText()
+    {
+        return $this->buttonText;
+    }
+
+    /**
+     * @param string $buttonText
+     */
+    public function setButtonText($buttonText)
+    {
+        $this->buttonText = $buttonText;
+    }
+
+    /**
      * @return int
      */
     public function getAmount()
@@ -174,6 +225,38 @@ class Invoice extends \Payrexx\Models\Base
     public function setAmount($amount)
     {
         $this->amount = $amount;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getVatRate()
+    {
+        return $this->vatRate;
+    }
+
+    /**
+     * @param float|null $vatRate
+     */
+    public function setVatRate($vatRate)
+    {
+        $this->vatRate = $vatRate;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSku()
+    {
+        return $this->sku;
+    }
+
+    /**
+     * @param string $sku
+     */
+    public function setSku($sku)
+    {
+        $this->sku = $sku;
     }
 
     /**
@@ -424,6 +507,24 @@ class Invoice extends \Payrexx\Models\Base
     public function setConcardisOrderId($concardisOrderId)
     {
         $this->concardisOrderId = $concardisOrderId;
+    }
+
+    /**
+     * Format: Y-m-d
+     * @return string
+     */
+    public function getExpirationDate()
+    {
+        return $this->expirationDate;
+    }
+
+    /**
+     * Format: Y-m-d
+     * @param string $expirationDate
+     */
+    public function setExpirationDate($expirationDate)
+    {
+        $this->expirationDate = $expirationDate;
     }
 
     /**

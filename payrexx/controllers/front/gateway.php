@@ -17,31 +17,48 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $transaction = Tools::getValue('transaction');
         $id_cart = $transaction['invoice']['referenceId'];
 
-        if (empty($id_cart) || !isset($transaction['status'])) {
+        // check required data
+        if (!$id_cart || !$transaction['status'] || !$transaction['id']) {
             die;
         }
 
         $gateway = $this->getPayrexxGateway((int)$id_cart);
+
+        // Validate request by gateway ID
         if (!$gateway) {
             PrestaShopLoggerCore::addLog('GATEWAY FOR CART ID: ' . $id_cart . ' NOT FOUND');
         }
 
-        $status = $gateway->getStatus();
-        if (empty($status) || $status !== $transaction['status'] || !in_array($status, ['confirmed', 'waiting'])) {
+        $transactionObj = $this->getPayrexxTransaction($transaction['id']);
+
+        $status = $transactionObj->getStatus();
+        if (empty($status) || $status !== $transaction['status']) {
             die;
         }
 
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart((int)$id_cart);
         if (Validate::isLoadedObject($cart) && $cart->OrderExists()) {
-            die();
+            $this->handleOrderStatusUpdate($transaction['status'], $id_cart);
+            die;
         }
 
         $customer = new Customer($cart->id_customer);
+
         try {
+            $prestaStatus = null;
+            switch($transaction['status']) {
+                case \Payrexx\Models\Response\Transaction::CONFIRMED:
+                    $prestaStatus = 'PS_OS_PAYMENT';
+                    return;
+                case \Payrexx\Models\Response\Transaction::WAITING:
+                    $prestaStatus = 'PS_OS_BANKWIRE';
+                    return;
+            }
+
             $payrexxModule->validateOrder(
                 (int)$id_cart,
-                (int)Configuration::get('PS_OS_PAYMENT'),
+                (int)Configuration::get($prestaStatus),
                 (float)$gateway->getAmount() / 100,
                 'Payrexx',
                 null,
@@ -50,10 +67,46 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
                 false,
                 $customer->secure_key
             );
+
+            $orderId = Order::getIdByCartId($this->id);
+            $objOrder = new Order($orderId);
+            $history = new OrderHistory();
+            $history->id_order = (int)$objOrder->id;
+            $history->changeIdOrderState((int)Configuration::get($prestaStatus), (int)($objOrder->id));
+
         } catch (PrestaShopException $e) {
             PrestaShopLoggerCore::addLog('CART ID: ' . $id_cart . ' - ' . $e->getMessage());
         }
         die();
+    }
+
+    private function handleOrderStatusUpdate($transactionStatus, $cartId){
+        $prestaStatus = null;
+        switch($transactionStatus) {
+            case \Payrexx\Models\Response\Transaction::ERROR:
+            case \Payrexx\Models\Response\Transaction::CANCELLED:
+            case \Payrexx\Models\Response\Transaction::EXPIRED:
+                $prestaStatus = 'PS_OS_ERROR';
+                break;
+            case \Payrexx\Models\Response\Transaction::REFUNDED:
+            case \Payrexx\Models\Response\Transaction::PARTIALLY_REFUNDED:
+                $prestaStatus = 'PS_OS_REFUND';
+                break;
+            case \Payrexx\Models\Response\Transaction::CONFIRMED:
+                $prestaStatus = 'PS_OS_PAYMENT';
+                return;
+            case \Payrexx\Models\Response\Transaction::WAITING:
+                $prestaStatus = 'PS_OS_BANKWIRE';
+                return;
+        }
+
+        $orderId = Order::getIdByCartId($cartId);
+        $objOrder = new Order($orderId);
+        $history = new OrderHistory();
+        $history->id_order = (int)$objOrder->id;
+        $history->changeIdOrderState((int)Configuration::get($prestaStatus), (int)($objOrder->id));
+
+        return;
     }
 
     /**
@@ -85,6 +138,27 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
 
         try {
             return $payrexx->getOne($gateway);
+        } catch (\Payrexx\PayrexxException $e) {
+            return;
+        }
+    }
+    /**
+     * Get Payrexx Gateway from the cart id
+     *
+     * @param int $id_cart Cart id
+     * @return \Payrexx\Models\Request\Gateway|NULL
+     */
+    public function getPayrexxTransaction($transactionID)
+    {
+        $instanceName = Configuration::get('PAYREXX_INSTANCE_NAME');
+        $secret = Configuration::get('PAYREXX_API_SECRET');
+
+        $payrexx = new \Payrexx\Payrexx($instanceName, $secret);
+        $transaction = new \Payrexx\Models\Request\Transaction();
+        $transaction->setId($transactionID);
+
+        try {
+            return $payrexx->getOne($transaction);
         } catch (\Payrexx\PayrexxException $e) {
             return;
         }

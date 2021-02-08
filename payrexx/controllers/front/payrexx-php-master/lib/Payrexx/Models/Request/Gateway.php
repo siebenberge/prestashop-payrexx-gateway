@@ -21,6 +21,22 @@ class Gateway extends \Payrexx\Models\Base
     protected $amount;
 
     /**
+     * optional
+     *
+     * @access  protected
+     * @var     float|null
+     */
+    protected $vatRate;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $sku;
+
+    /**
      * mandatory
      *
      * @access  protected
@@ -109,6 +125,14 @@ class Gateway extends \Payrexx\Models\Base
     protected $failedRedirectUrl;
 
     /**
+     * mandatory
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $cancelRedirectUrl;
+
+    /**
      * optional
      *
      * @access  protected
@@ -116,6 +140,93 @@ class Gateway extends \Payrexx\Models\Base
      */
     protected $skipResultPage;
 
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     boolean
+     */
+    protected $chargeOnAuthorization;
+
+    /**
+     * optional: Only for Clearhaus transactions.
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $customerStatementDescriptor;
+
+    /**
+     * optional: Gateway validity in minutes.
+     *
+     * @access  protected
+     * @var     int
+     */
+    protected $validity;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     bool
+     */
+    protected $subscriptionState = false;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $subscriptionInterval = '';
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $subscriptionPeriod = '';
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $subscriptionPeriodMinAmount = '';
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $subscriptionCancellationInterval = '';
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     array $buttonText
+     */
+    protected $buttonText;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string $lookAndFeelProfile
+     */
+    protected $lookAndFeelProfile;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     array $successMessage
+     */
+    protected $successMessage;
 
     /**
      * @access  public
@@ -136,6 +247,38 @@ class Gateway extends \Payrexx\Models\Base
     public function setAmount($amount)
     {
         $this->amount = $amount;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getVatRate()
+    {
+        return $this->vatRate;
+    }
+
+    /**
+     * @param float|null $vatRate
+     */
+    public function setVatRate($vatRate)
+    {
+        $this->vatRate = $vatRate;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSku()
+    {
+        return $this->sku;
+    }
+
+    /**
+     * @param string $sku
+     */
+    public function setSku($sku)
+    {
+        $this->sku = $sku;
     }
 
     /**
@@ -373,6 +516,25 @@ class Gateway extends \Payrexx\Models\Base
     }
 
     /**
+     * @access  public
+     * @return  string
+     */
+    public function getCancelRedirectUrl()
+    {
+        return $this->cancelRedirectUrl;
+    }
+
+    /**
+     * Set the url to redirect to after cancelled payment.
+     *
+     * @param   string  $cancelRedirectUrl
+     */
+    public function setCancelRedirectUrl($cancelRedirectUrl)
+    {
+        $this->cancelRedirectUrl = $cancelRedirectUrl;
+    }
+
+    /**
      * @return bool
      */
     public function isSkipResultPage()
@@ -389,11 +551,218 @@ class Gateway extends \Payrexx\Models\Base
     }
 
     /**
+     * @return bool
+     */
+    public function isChargeOnAuthorization()
+    {
+        return $this->chargeOnAuthorization;
+    }
+
+    /**
+     * @param bool $chargeOnAuthorization
+     */
+    public function setChargeOnAuthorization($chargeOnAuthorization)
+    {
+        $this->chargeOnAuthorization = $chargeOnAuthorization;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomerStatementDescriptor()
+    {
+        return $this->customerStatementDescriptor;
+    }
+
+    /**
+     * @param string $customerStatementDescriptor
+     */
+    public function setCustomerStatementDescriptor(string $customerStatementDescriptor): void
+    {
+        $this->customerStatementDescriptor = $customerStatementDescriptor;
+    }
+
+    /**
+     * Validity in minutes.
+     * @return int
+     */
+    public function getValidity()
+    {
+        return $this->validity;
+    }
+
+    /**
+     * Validity in minutes.
+     * @param int $validity
+     */
+    public function setValidity($validity)
+    {
+        $this->validity = $validity;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getResponseModel()
     {
         return new \Payrexx\Models\Response\Gateway();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSubscriptionState()
+    {
+        return $this->subscriptionState;
+    }
+
+    /**
+     * Set whether the payment should be a recurring payment (subscription)
+     * If you set to TRUE, you should provide a
+     * subscription interval, period and cancellation interval
+     * Note: Subscription and pre-authorization can not be combined.
+     *
+     * @param boolean $subscriptionState
+     */
+    public function setSubscriptionState($subscriptionState)
+    {
+        $this->subscriptionState = $subscriptionState;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionInterval()
+    {
+        return $this->subscriptionInterval;
+    }
+
+    /**
+     * Set the payment interval, this should be a string formatted like ISO 8601
+     * (PnYnMnDTnHnMnS)
+     *
+     * Use case:
+     * If you set this value to P6M the customer will pay every 6 months on this
+     * subscription.
+     *
+     * It is possible to define XY years / months or days.
+     *
+     * For further information see http://php.net/manual/en/class.dateinterval.php
+     *
+     * @param string $subscriptionInterval
+     */
+    public function setSubscriptionInterval($subscriptionInterval)
+    {
+        $this->subscriptionInterval = $subscriptionInterval;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionPeriod()
+    {
+        return $this->subscriptionPeriod;
+    }
+
+    /**
+     * Set the subscription period after how many years / months or days the subscription
+     * will get renewed.
+     *
+     * This should be a string formatted like ISO 8601 (PnYnMnDTnHnMnS)
+     *
+     * Use case:
+     * If you set this value to P1Y the subscription will be renewed every year.
+     *
+     * It is possible to define XY years / months or days.
+     *
+     * For further information see http://php.net/manual/en/class.dateinterval.php
+     *
+     * @param string $subscriptionPeriod
+     */
+    public function setSubscriptionPeriod($subscriptionPeriod)
+    {
+        $this->subscriptionPeriod = $subscriptionPeriod;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubscriptionCancellationInterval()
+    {
+        return $this->subscriptionCancellationInterval;
+    }
+
+    /**
+     * Set the cancellation interval, it means you can define how many days or months
+     * the client has to cancel the subscription before the end of subscription period.
+     *
+     * This should be a string formatted like ISO 8601 (PnYnMnDTnHnMnS)
+     *
+     * Use case:
+     * If you set this value to P1M the subscription has to be cancelled one month
+     * before end of subscription period.
+     *
+     * It is possible to define XY months or days. Years are not supported here.
+     *
+     * For further information see http://php.net/manual/en/class.dateinterval.php
+     *
+     * @param string $subscriptionCancellationInterval
+     */
+    public function setSubscriptionCancellationInterval($subscriptionCancellationInterval)
+    {
+        $this->subscriptionCancellationInterval = $subscriptionCancellationInterval;
+    }
+
+    /**
+     * @return array
+     */
+    public function getButtonText()
+    {
+        return $this->buttonText;
+    }
+
+    /**
+     * Use language ID as array key. Use key 0 as default purpose. Will be used for each activated frontend language.
+     *
+     * @param array $buttonText
+     */
+    public function setButtonText($buttonText)
+    {
+        $this->buttonText = $buttonText;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLookAndFeelProfile()
+    {
+        return $this->lookAndFeelProfile;
+    }
+
+    /**
+     * @param string $lookAndFeelProfile
+     */
+    public function setLookAndFeelProfile($lookAndFeelProfile)
+    {
+        $this->lookAndFeelProfile = $lookAndFeelProfile;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSuccessMessage()
+    {
+        return $this->successMessage;
+    }
+
+    /**
+     * Use language ID as array key. Use key 0 as default purpose. Will be used for each activated frontend language.
+     *
+     * @param array $successMessage
+     */
+    public function setSuccessMessage($successMessage)
+    {
+        $this->successMessage = $successMessage;
     }
 
 }

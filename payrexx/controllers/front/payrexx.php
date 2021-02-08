@@ -13,6 +13,9 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
     const MODULE_NAME = 'payrexx';
 
+    private $supportedLang = ['nl', 'fr', 'de', 'it', 'nl', 'pt', 'tr', 'pl', 'es', 'dk'];
+    private $defaultLang = 'en';
+
     public function postProcess()
     {
         $context = Context::getContext();
@@ -55,6 +58,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         $gateway->setAmount($total * 100);
         $gateway->setCurrency($currencyIsoCode);
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
+        $gateway->setCancelRedirectUrl($failedRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
         $gateway->setPsp(array());
         $gateway->setReferenceId($cart->id);
@@ -87,6 +91,11 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $context->cookie->paymentId = $response->getId();
             static::insertCartGatewayId($cart->id, $response->getId());
             $lang = Language::getIsoById($context->cookie->id_lang);
+
+            if (!in_array($lang, $this->supportedLang)) {
+                $lang = $this->defaultLang;
+            }
+
             $gatewayUrl = 'https://' . $instanceName . '.payrexx.com/' . $lang . '/?payment=' . $response->getHash();
 
             if ((bool)Configuration::get('PAYREXX_USE_MODAL')) {

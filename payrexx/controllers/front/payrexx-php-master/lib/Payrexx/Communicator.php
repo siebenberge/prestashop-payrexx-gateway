@@ -14,18 +14,23 @@ namespace Payrexx;
 class Communicator
 {
     const VERSION = 'v1';
-    const API_URL = 'https://api.payrexx.com/%s/%s/%d/';
+    const API_URL_FORMAT = 'https://api.%s/%s/%s/%d/%s';
+    const API_URL_BASE_DOMAIN = 'payrexx.com';
+    const DEFAULT_COMMUNICATION_HANDLER = '\Payrexx\CommunicationAdapter\CurlCommunication';
+
     /**
      * @var array A set of methods which can be used to communicate with the API server.
      */
     protected static $methods = array(
-        'create' => 'POST',
-        'charge' => 'POST',
-        'cancel' => 'DELETE',
-        'delete' => 'DELETE',
-        'update' => 'PUT',
-        'getAll' => 'GET',
-        'getOne' => 'GET',
+        'create'  => 'POST',
+        'charge'  => 'POST',
+        'refund'  => 'POST',
+        'capture' => 'POST',
+        'cancel'  => 'DELETE',
+        'delete'  => 'DELETE',
+        'update'  => 'PUT',
+        'getAll'  => 'GET',
+        'getOne'  => 'GET',
     );
     /**
      * @var string The Payrexx instance name.
@@ -36,6 +41,10 @@ class Communicator
      */
     protected $apiSecret;
     /**
+     * @var string The base domain of the API URL.
+     */
+    protected $apiBaseDomain;
+    /**
      * @var string The communication handler which handles the HTTP requests. Default cURL Communication handler
      */
     protected $communicationHandler;
@@ -44,19 +53,20 @@ class Communicator
      * Generates a communicator object with a communication handler like cURL.
      *
      * @param string $instance             The instance name, needed for the generation of the API url.
-     * @param string $apiSecret            The API secret which is the key to hash all the parameters passed to the API
-     *                                     server.
+     * @param string $apiSecret            The API secret which is the key to hash all the parameters passed to the API server.
      * @param string $communicationHandler The preferred communication handler. Default is cURL.
+     * @param string $apiBaseDomain        The base domain of the API URL.
      *
-     * @throws \Payrexx\PayrexxException
+     * @throws PayrexxException
      */
-    public function __construct($instance, $apiSecret, $communicationHandler = '\Payrexx\CommunicationAdapter\CurlCommunication')
+    public function __construct($instance, $apiSecret, $communicationHandler, $apiBaseDomain)
     {
         $this->instance = $instance;
         $this->apiSecret = $apiSecret;
+        $this->apiBaseDomain = $apiBaseDomain;
 
         if (!class_exists($communicationHandler)) {
-            throw new \Payrexx\PayrexxException('Communication handler class ' . $communicationHandler . ' not found');
+            throw new PayrexxException('Communication handler class ' . $communicationHandler . ' not found');
         }
         $this->communicationHandler = new $communicationHandler();
     }
@@ -84,15 +94,23 @@ class Communicator
     public function performApiRequest($method, \Payrexx\Models\Base $model)
     {
         $params = $model->toArray($method);
+        $paramsWithoutFiles = $params;
+        unset($paramsWithoutFiles['headerImage'], $paramsWithoutFiles['backgroundImage'], $paramsWithoutFiles['headerBackgroundImage'], $paramsWithoutFiles['emailHeaderImage'], $paramsWithoutFiles['VPOSBackgroundImage']);
         $params['ApiSignature'] =
-            base64_encode(hash_hmac('sha256', http_build_query($params, null, '&'), $this->apiSecret, true));
+            base64_encode(hash_hmac('sha256', http_build_query($paramsWithoutFiles, null, '&'), $this->apiSecret, true));
         $params['instance'] = $this->instance;
 
         $id = isset($params['id']) ? $params['id'] : 0;
+        $act = in_array($method, ['refund', 'capture']) ? $method : '';
+        $apiUrl = sprintf(self::API_URL_FORMAT, $this->apiBaseDomain, self::VERSION, $params['model'], $id, $act);
+
+        $httpMethod = $this->getHttpMethod($method) === 'PUT' && $params['model'] === 'Design'
+            ? 'POST'
+            : $this->getHttpMethod($method);
         $response = $this->communicationHandler->requestApi(
-            sprintf(self::API_URL, self::VERSION, $params['model'], $id),
+            $apiUrl,
             $params,
-            $this->getHttpMethod($method)
+            $httpMethod
         );
 
         $convertedResponse = array();
@@ -107,10 +125,7 @@ class Communicator
             $responseModel = $model->getResponseModel();
             $convertedResponse[] = $responseModel->fromArray($object);
         }
-        if (
-            strpos($method, 'One') !== false ||
-            strpos($method, 'create') !== false
-        ) {
+        if ($method !== 'getAll') {
             $convertedResponse = current($convertedResponse);
         }
         return $convertedResponse;
