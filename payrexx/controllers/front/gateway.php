@@ -37,12 +37,13 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         $payrexxModule = Module::getInstanceByName('payrexx');
-        $cart = new Cart((int)$id_cart);
-        if (Validate::isLoadedObject($cart) && $cart->OrderExists()) {
-            $this->handleOrderStatusUpdate($transaction['status'], $id_cart);
+
+        $orderId = Order::getIdByCartId($id_cart);
+        if ($orderId) {
+            $this->handleOrderStatusUpdate($transaction['status'], $orderId);
             die;
         }
-
+        $cart = new Cart((int)$id_cart);
         $customer = new Customer($cart->id_customer);
 
         try {
@@ -68,19 +69,13 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
                 $customer->secure_key
             );
 
-            $orderId = Order::getIdByCartId($this->id);
-            $objOrder = new Order($orderId);
-            $history = new OrderHistory();
-            $history->id_order = (int)$objOrder->id;
-            $history->changeIdOrderState((int)Configuration::get($prestaStatus), (int)($objOrder->id));
-
         } catch (PrestaShopException $e) {
             PrestaShopLoggerCore::addLog('CART ID: ' . $id_cart . ' - ' . $e->getMessage());
         }
         die();
     }
 
-    private function handleOrderStatusUpdate($transactionStatus, $cartId)
+    private function handleOrderStatusUpdate($transactionStatus, $orderId)
     {
         $prestaStatus = null;
         switch ($transactionStatus) {
@@ -95,17 +90,17 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
                 break;
             case \Payrexx\Models\Response\Transaction::CONFIRMED:
                 $prestaStatus = 'PS_OS_PAYMENT';
-                return;
+                break;
             case \Payrexx\Models\Response\Transaction::WAITING:
                 $prestaStatus = 'PS_OS_BANKWIRE';
-                return;
+                break;
         }
 
-        $orderId = Order::getIdByCartId($cartId);
         $objOrder = new Order($orderId);
         $history = new OrderHistory();
         $history->id_order = (int)$objOrder->id;
-        $history->changeIdOrderState((int)Configuration::get($prestaStatus), (int)($objOrder->id));
+        $history->changeIdOrderState(Configuration::get($prestaStatus), $objOrder, true);
+        $history->addWithemail();
 
         return;
     }
