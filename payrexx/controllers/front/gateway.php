@@ -43,36 +43,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             $this->handleOrderStatusUpdate($transaction['status'], $orderId);
             die;
         }
-        $cart = new Cart((int)$id_cart);
-        $customer = new Customer($cart->id_customer);
-
-        try {
-            $prestaStatus = null;
-            switch ($transaction['status']) {
-                case \Payrexx\Models\Response\Transaction::CONFIRMED:
-                    $prestaStatus = 'PS_OS_PAYMENT';
-                    return;
-                case \Payrexx\Models\Response\Transaction::WAITING:
-                    $prestaStatus = 'PS_OS_BANKWIRE';
-                    return;
-            }
-
-            $payrexxModule->validateOrder(
-                (int)$id_cart,
-                (int)Configuration::get($prestaStatus),
-                (float)$gateway->getAmount() / 100,
-                'Payrexx',
-                null,
-                array(),
-                (int)$cart->id_currency,
-                false,
-                $customer->secure_key
-            );
-
-        } catch (PrestaShopException $e) {
-            PrestaShopLoggerCore::addLog('CART ID: ' . $id_cart . ' - ' . $e->getMessage());
-        }
-        die();
+        die;
     }
 
     private function handleOrderStatusUpdate($transactionStatus, $orderId)
