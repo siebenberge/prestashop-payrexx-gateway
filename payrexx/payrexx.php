@@ -51,9 +51,7 @@ class Payrexx extends PaymentModule
             return false;
         }
 
-        if (!Configuration::updateValue('PAYREXX_LABEL', '')
-            || !Configuration::updateValue('PAYREXX_DESCRIPTION', '')
-            || !Configuration::updateValue('PAYREXX_API_SECRET', '')
+        if (!Configuration::updateValue('PAYREXX_API_SECRET', '')
             || !Configuration::updateValue('PAYREXX_INSTANCE_NAME', '')
             || !Configuration::updateValue('PAYREXX_USE_MODAL', '')
             || !Configuration::updateValue('PAYREXX_PAY_ICONS', '')
@@ -97,8 +95,6 @@ class Payrexx extends PaymentModule
     public function uninstall()
     {
         $config = array(
-            'PAYREXX_LABEL',
-            'PAYREXX_DESCRIPTION',
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
             'PAYREXX_USE_MODAL',
@@ -177,18 +173,6 @@ class Payrexx extends PaymentModule
             'input' => array(
                 array(
                     'type' => 'text',
-                    'label' => $this->l('Title'),
-                    'name' => 'payrexx_label',
-                    'required' => true
-                ),
-                array(
-                    'type' => 'textarea',
-                    'label' => $this->l('Description'),
-                    'name' => 'payrexx_description',
-                    'required' => true
-                ),
-                array(
-                    'type' => 'text',
                     'label' => $this->l('API Secret'),
                     'name' => 'payrexx_api_secret',
                     'required' => true
@@ -236,8 +220,8 @@ class Payrexx extends PaymentModule
         );
 
         $fields_value = array(
-            'payrexx_label' => Configuration::get('PAYREXX_LABEL'),
-            'payrexx_description' => Configuration::get('PAYREXX_DESCRIPTION'),
+            'payrexx_label' => $this->l('Payrexx payment method title'),
+            'payrexx_description' => $this->l('Payrexx payment method description'),
             'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
             'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
             'payrexx_use_modal' => (bool)Configuration::get('PAYREXX_USE_MODAL'),
@@ -271,8 +255,6 @@ class Payrexx extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
-            Configuration::updateValue('PAYREXX_LABEL', Tools::getValue('payrexx_label'));
-            Configuration::updateValue('PAYREXX_DESCRIPTION', Tools::getValue('payrexx_description'));
             Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
             Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
             Configuration::updateValue('PAYREXX_USE_MODAL', Tools::getValue('payrexx_use_modal'));
@@ -312,7 +294,7 @@ class Payrexx extends PaymentModule
     // Payment hook for version < 1.7
     public function hookPayment($params)
     {
-        $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
+        $action_text = $this->l('Payrexx payment method title');
         $this->smarty->assign(array(
             'payrexx_url' => $this->context->link->getModuleLink($this->name, 'payrexx'),
             'image_path' => $this->_path,
@@ -327,7 +309,7 @@ class Payrexx extends PaymentModule
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-        $action_text = $this->l(Configuration::get('PAYREXX_LABEL'));
+        $action_text = $this->l('Payrexx payment method title');
         $this->context->smarty->assign(array(
             'path' => $this->_path,
         ));
@@ -345,12 +327,12 @@ class Payrexx extends PaymentModule
         }
 
         $payIcons = '';
-        foreach ($payIconSource as $iconSource) {
+        foreach ((array)$payIconSource as $iconSource) {
             $payIcons .= '<img style="width: 50px" src="' . $this->_path . 'views/img/cardicons/card_' . $iconSource . '.svg" />';
         }
 
         $payment_option->setAdditionalInformation(
-            Configuration::get('PAYREXX_DESCRIPTION') .
+            $this->l('Payrexx payment method description') .
             $additionalModalCode .
             '<div class="payrexxPayIcons">' . $payIcons . '</div>');
 
