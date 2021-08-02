@@ -163,6 +163,8 @@ class Payrexx extends PaymentModule
             array('id_option' => 'giropay', 'name' => 'GiroPay'),
             array('id_option' => 'eps', 'name' => 'EPS'),
             array('id_option' => 'google_pay', 'name' => 'Google Pay'),
+            array('id_option' => 'wechat_pay', 'name' => 'WeChat Pay'),
+            array('id_option' => 'alipay', 'name' => 'Alipay'),
         );
 
         $fields_form = array();
@@ -327,14 +329,19 @@ class Payrexx extends PaymentModule
         }
 
         $payIcons = '';
-        foreach ((array)$payIconSource as $iconSource) {
-            $payIcons .= '<img style="width: 50px" src="' . $this->_path . 'views/img/cardicons/card_' . $iconSource . '.svg" />';
+        if ($payIconSource) {
+
+            foreach ((array)$payIconSource as $iconSource) {
+                $payIcons .= '<img style="width: 50px" src="' . $this->_path . 'views/img/cardicons/card_' . $iconSource . '.svg" />';
+            }
+
+            $payIcons = '<div class="payrexxPayIcons">' . $payIcons . '</div>';
         }
 
         $payment_option->setAdditionalInformation(
             $this->l('Payrexx payment method description') .
             $additionalModalCode .
-            '<div class="payrexxPayIcons">' . $payIcons . '</div>');
+            $payIcons);
 
         $payment_options = array(
             $payment_option,
