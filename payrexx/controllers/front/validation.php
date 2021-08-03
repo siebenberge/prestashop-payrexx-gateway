@@ -79,7 +79,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                     'Payrexx',
                     null,
                     array(),
-                    (int)$this->context->currency->id,
+                    (int)$cart->id_currency,
                     false,
                     $customer->secure_key
                 );
