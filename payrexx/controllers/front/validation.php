@@ -63,7 +63,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             $invoice = $invoices ? end($invoices) : null;
             $transaction = $invoice ? end($invoice['transactions']) : null;
             if ($transaction && in_array($transaction['status'], array('confirmed', 'waiting'))) {
-                switch($transaction['status']) {
+                switch($transaction['status'] ) {
                     case \Payrexx\Models\Response\Transaction::CONFIRMED:
                         $prestaStatus = 'PS_OS_PAYMENT';
                         break;

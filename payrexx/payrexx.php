@@ -330,7 +330,6 @@ class Payrexx extends PaymentModule
 
         $payIcons = '';
         if ($payIconSource) {
-
             foreach ((array)$payIconSource as $iconSource) {
                 $payIcons .= '<img style="width: 50px" src="' . $this->_path . 'views/img/cardicons/card_' . $iconSource . '.svg" />';
             }
@@ -338,10 +337,7 @@ class Payrexx extends PaymentModule
             $payIcons = '<div class="payrexxPayIcons">' . $payIcons . '</div>';
         }
 
-        $payment_option->setAdditionalInformation(
-            $this->l('Payrexx payment method description') .
-            $additionalModalCode .
-            $payIcons);
+        $payment_option->setAdditionalInformation($this->l('Payrexx payment method description') . $additionalModalCode . $payIcons);
 
         $payment_options = array(
             $payment_option,

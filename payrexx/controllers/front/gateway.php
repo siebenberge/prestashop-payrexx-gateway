@@ -34,7 +34,8 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         die;
     }
 
-    private function validRequest($transaction, $cartId, $requestStatus) {
+    private function validRequest($transaction, $cartId, $requestStatus)
+    {
 
         // check required data
         if (!$cartId || !$requestStatus || !$transaction['id']) {
@@ -64,7 +65,8 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         return true;
     }
 
-    private function createOrder($cartId, $prestaStatus, $amount) {
+    private function createOrder($cartId, $prestaStatus, $amount)
+    {
         $payrexxModule = Module::getInstanceByName('payrexx');
 
         $cart = new Cart($cartId);
@@ -94,7 +96,8 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         return;
     }
 
-    private function getPrestaStatus($transactionStatus) {
+    private function getPrestaStatus($transactionStatus)
+    {
         $prestaStatus = null;
         switch ($transactionStatus) {
             case \Payrexx\Models\Response\Transaction::ERROR:
