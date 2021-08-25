@@ -21,7 +21,11 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     {
         try {
             // Collect Gateway data
-            $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(Configuration::get('PAYREXX_INSTANCE_NAME'), Configuration::get('PAYREXX_API_SECRET'), Configuration::get('PAYREXX_PLATFORM'));
+            $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(
+                Configuration::get('PAYREXX_INSTANCE_NAME'),
+                Configuration::get('PAYREXX_API_SECRET'),
+                Configuration::get('PAYREXX_PLATFORM')
+            );
             $context = Context::getContext();
 
             $cart = $context->cart;
@@ -50,7 +54,17 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $payrexxApiService->deletePayrexxGateway($gatewayId);
             }
 
-            $gateway = $payrexxApiService->createPayrexxGateway($purpose, $total, $currencyIsoCode, $successRedirectUrl, $failedRedirectUrl, $cart, $customer, $address, $country);
+            $gateway = $payrexxApiService->createPayrexxGateway(
+                $purpose,
+                $total,
+                $currencyIsoCode,
+                $successRedirectUrl,
+                $failedRedirectUrl,
+                $cart,
+                $customer,
+                $address,
+                $country
+            );
 
             $context->cookie->paymentId = $gateway->getId();
             static::insertCartGatewayId($cart->id, $gateway->getId());

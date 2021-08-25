@@ -44,7 +44,11 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             return false;
         }
 
-        $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(Configuration::get('PAYREXX_INSTANCE_NAME'), Configuration::get('PAYREXX_API_SECRET'), Configuration::get('PAYREXX_PLATFORM'));
+        $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(
+            Configuration::get('PAYREXX_INSTANCE_NAME'),
+            Configuration::get('PAYREXX_API_SECRET'),
+            Configuration::get('PAYREXX_PLATFORM')
+        );
         $gateway = $payrexxApiService->getPayrexxGateway((int)$cartId);
 
         // Validate request by gateway ID
@@ -95,8 +99,6 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $history->id_order = (int)$objOrder->id;
         $history->changeIdOrderState(Configuration::get($prestaStatus), $objOrder, true);
         $history->addWithemail();
-
-        return;
     }
 
     private function getPrestaStatus($transactionStatus)

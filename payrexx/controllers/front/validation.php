@@ -17,7 +17,11 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         $cart = $this->context->cart;
         $gatewayId = $this->context->cookie->paymentId;
 
-        $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(Configuration::get('PAYREXX_INSTANCE_NAME'), Configuration::get('PAYREXX_API_SECRET'), Configuration::get('PAYREXX_PLATFORM'));
+        $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(
+            Configuration::get('PAYREXX_INSTANCE_NAME'),
+            Configuration::get('PAYREXX_API_SECRET'),
+            Configuration::get('PAYREXX_PLATFORM')
+        );
 
         $payrexxModule = Module::getInstanceByName('payrexx');
         $customer = new Customer($cart->id_customer);

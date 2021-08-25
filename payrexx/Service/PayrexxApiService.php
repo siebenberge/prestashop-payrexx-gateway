@@ -27,6 +27,7 @@ class PayrexxApiService
         $this->apiKey = $apiKey;
         $this->platform = $platform;
     }
+
     /**
      *
      * @param int $gatewayId
