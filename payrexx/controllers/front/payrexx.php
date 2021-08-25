@@ -9,6 +9,7 @@
  * @license MIT License
  */
 
+require_once _PS_MODULE_DIR_ . '/payrexx/Service/PayrexxApiService.php';
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
     const MODULE_NAME = 'payrexx';
@@ -18,105 +19,63 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        $context = Context::getContext();
-        $cart = $context->cart;
-
-        $productNames = array();
-        $products = $cart->getProducts();
-        foreach ($products as $product) {
-            $quantity = $product['cart_quantity'] > 1 ? $product['cart_quantity'] . 'x ' : '';
-            $productNames[] = $quantity . $product['name'];
-        }
-
-        $customer = $context->customer;
-        $address = new Address($cart->id_address_delivery);
-
-        $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
-        $currency = $context->currency->iso_code;
-
-        $successRedirectUrl = Context::getContext()->link
-            ->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
-        $failedRedirectUrl = Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1';
-
-        spl_autoload_register(function ($class) {
-            $root = _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master';
-            $classFile = $root . '/lib/' . str_replace('\\', '/', $class) . '.php';
-            if (file_exists($classFile)) {
-                require_once $classFile;
-            }
-        });
-
-        $instanceName = Configuration::get('PAYREXX_INSTANCE_NAME');
-        $secret = Configuration::get('PAYREXX_API_SECRET');
-        $payrexx = new \Payrexx\Payrexx($instanceName, $secret);
-        $gateway = new \Payrexx\Models\Request\Gateway();
-
-        $currencyIsoCode = !empty($currency) ? $currency : 'USD';
-        $iso = Country::getIsoById($address->id_country);
-
-        $gateway->setPurpose(implode(', ', $productNames));
-        $gateway->setAmount($total * 100);
-        $gateway->setCurrency($currencyIsoCode);
-        $gateway->setSuccessRedirectUrl($successRedirectUrl);
-        $gateway->setCancelRedirectUrl($failedRedirectUrl);
-        $gateway->setFailedRedirectUrl($failedRedirectUrl);
-        $gateway->setPsp(array());
-        $gateway->setReferenceId($cart->id);
-        $gateway->setSkipResultPage(true);
-
-        $gateway->addField('title', '');
-        $gateway->addField('forename', $customer->firstname);
-        $gateway->addField('surname', $customer->lastname);
-        $gateway->addField('company', $customer->company);
-        $gateway->addField('street', $address->address1);
-        $gateway->addField('postcode', $address->postcode);
-        $gateway->addField('place', $address->city);
-        $gateway->addField('country', $iso);
-        $gateway->addField('phone', $address->phone);
-        $gateway->addField('email', $customer->email);
-        $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
-
         try {
-            if ($gatewayId = static::getGatewayIdByForCartId($cart->id)) {
-                $oldGateway = new \Payrexx\Models\Request\Gateway();
-                $oldGateway->setId($gatewayId);
+            // Collect Gateway data
+            $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(Configuration::get('PAYREXX_INSTANCE_NAME'), Configuration::get('PAYREXX_API_SECRET'), Configuration::get('PAYREXX_PLATFORM'));
+            $context = Context::getContext();
 
-                try {
-                    $payrexx->delete($oldGateway);
-                } catch (\Payrexx\PayrexxException $e) {
-                }
+            $cart = $context->cart;
+            $productNames = array();
+            $products = $cart->getProducts();
+            foreach ($products as $product) {
+                $quantity = $product['cart_quantity'] > 1 ? $product['cart_quantity'] . 'x ' : '';
+                $productNames[] = $quantity . $product['name'];
             }
 
-            $response = $payrexx->create($gateway);
-            $context->cookie->paymentId = $response->getId();
-            static::insertCartGatewayId($cart->id, $response->getId());
+            $customer = $context->customer;
+            $address = new Address($cart->id_address_delivery);
+
+            $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
+            $currency = $context->currency->iso_code;
+
+            $successRedirectUrl = Context::getContext()->link
+                ->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
+            $failedRedirectUrl = Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1';
+            $currencyIsoCode = !empty($currency) ? $currency : 'USD';
+            $country = Country::getIsoById($address->id_country);
+
+            $purpose = implode(', ', $productNames);
+
+            if ($gatewayId = static::getGatewayIdByForCartId($cart->id)) {
+                $payrexxApiService->deletePayrexxGateway($gatewayId);
+            }
+
+            $gateway = $payrexxApiService->createPayrexxGateway($purpose, $total, $currencyIsoCode, $successRedirectUrl, $failedRedirectUrl, $cart, $customer, $address, $country);
+
+            $context->cookie->paymentId = $gateway->getId();
+            static::insertCartGatewayId($cart->id, $gateway->getId());
             $lang = Language::getIsoById($context->cookie->id_lang);
 
             if (!in_array($lang, $this->supportedLang)) {
                 $lang = $this->defaultLang;
             }
 
-            $gatewayUrl = 'https://' . $instanceName . '.payrexx.com/' . $lang . '/?payment=' . $response->getHash();
+            $link = $gateway->getLink();
+            $gatewayUrl = str_replace('?', $lang . '/?', $link);
 
-            if ((bool)Configuration::get('PAYREXX_USE_MODAL')) {
-                $context->cookie->payrexx_gateway_url = $gatewayUrl;
-                Tools::redirect('index.php?controller=order&step=1');
-            } else {
-                Tools::redirect($gatewayUrl);
-            }
+            Tools::redirect($gatewayUrl);
         } catch (\Payrexx\PayrexxException $e) {
             Tools::redirect('index.php?controller=order&step=1');
         }
     }
 
     /**
-     * Insert Gateway id
      *
-     * @param int $id_cart    cart id
+     * @param int $id_cart cart id
      * @param int $id_gateway gateway id
      * @return boolean
      */
-    public static function insertCartGatewayId($id_cart, $id_gateway)
+    private static function insertCartGatewayId($id_cart, $id_gateway)
     {
         if (empty($id_cart) || empty($id_gateway)) {
             return false;
@@ -130,9 +89,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Check if Gateway already exists for Cart id
      *
-     * @param int $id_cart    cart id
+     * @param int $id_cart cart id
      * @return int
      */
     public static function getGatewayIdByForCartId($id_cart)

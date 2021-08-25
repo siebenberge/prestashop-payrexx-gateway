@@ -20,7 +20,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.0.21';
+        $this->version = '1.0.22';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
@@ -51,9 +51,9 @@ class Payrexx extends PaymentModule
             return false;
         }
 
-        if (!Configuration::updateValue('PAYREXX_API_SECRET', '')
+        if (!Configuration::updateValue('PAYREXX_PLATFORM', '')
+            || !Configuration::updateValue('PAYREXX_API_SECRET', '')
             || !Configuration::updateValue('PAYREXX_INSTANCE_NAME', '')
-            || !Configuration::updateValue('PAYREXX_USE_MODAL', '')
             || !Configuration::updateValue('PAYREXX_PAY_ICONS', '')
         ) {
             return false;
@@ -95,9 +95,9 @@ class Payrexx extends PaymentModule
     public function uninstall()
     {
         $config = array(
+            'PAYREXX_PLATFORM',
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
-            'PAYREXX_USE_MODAL',
             'PAYREXX_PAY_ICONS',
         );
         foreach ($config as $var) {
@@ -129,7 +129,7 @@ class Payrexx extends PaymentModule
     {
         $this->postProcess();
 
-        $options = array(
+        $paymentMethods = array(
             array('id_option' => 'masterpass', 'name' => 'Masterpass',),
             array('id_option' => 'mastercard', 'name' => 'Mastercard',),
             array('id_option' => 'visa', 'name' => 'Visa',),
@@ -167,19 +167,41 @@ class Payrexx extends PaymentModule
             array('id_option' => 'alipay', 'name' => 'Alipay'),
         );
 
-        $fields_form = array();
-        $fields_form[0]['form'] = array(
-            'legend' => array(
+        $platforms = [
+            [
+                'url' => 'payrexx.com',
+                'name' => 'Payrexx',
+            ],
+            [
+                'url' => 'shop-and-pay.com',
+                'name' => 'Shop and Pay',
+            ],
+        ];
+
+        $fields_form = [];
+        $fields_form[0]['form'] = [
+            'legend' => [
                 'title' => $this->l('Settings'),
-            ),
-            'input' => array(
-                array(
+            ],
+            'input' => [
+                [
+                    'type' => 'select',
+                    'label' => $this->l('Payment Icons'),
+                    'name' => 'payrexx_platform',
+                    'multiple' => false,
+                    'options' => [
+                        'query' => $platforms,
+                        'id' => 'url',
+                        'name' => 'name',
+                    ],
+                ],
+                [
                     'type' => 'text',
                     'label' => $this->l('API Secret'),
                     'name' => 'payrexx_api_secret',
                     'required' => true
-                ),
-                array(
+                ],
+                [
                     'type' => 'text',
                     'label' => $this->l('INSTANCE NAME') .
                         "<br /><small style='color:#00f; font-weight:normal'>
@@ -187,46 +209,31 @@ class Payrexx extends PaymentModule
                             https://INSTANCE.payrexx.com)</small>",
                     'name' => 'payrexx_instance_name',
                     'required' => true
-                ),
-                array(
-                    'type' => 'checkbox',
-                    'label' => $this->l('Use Modal Checkout'),
-                    'name' => 'payrexx',
-                    'values' => array(
-                        'query' => array(
-                            array(
-                                'id' => 'use_modal',
-                                'val' => '1',
-                            )
-                        ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
+                ],
+                [
                     'type' => 'select',
                     'label' => $this->l('Payment Icons'),
                     'name' => 'payrexx_pay_icons',
                     'multiple' => true,
-                    'options' => array(
-                        'query' => $options,
+                    'options' => [
+                        'query' => $paymentMethods,
                         'id' => 'id_option',
                         'name' => 'name',
-                    )
-                ),
-            ),
-            'submit' => array(
+                    ]
+                ],
+            ],
+            'submit' => [
                 'title' => $this->l('Save'),
                 'class' => 'btn btn-default pull-right'
-            )
-        );
+            ],
+        ];
 
         $fields_value = array(
             'payrexx_label' => $this->l('Payrexx payment method title'),
             'payrexx_description' => $this->l('Payrexx payment method description'),
+            'payrexx_platform' => Configuration::get('PAYREXX_PLATFORM'),
             'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
             'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
-            'payrexx_use_modal' => (bool)Configuration::get('PAYREXX_USE_MODAL'),
             'payrexx_pay_icons[]' => unserialize(Configuration::get('PAYREXX_PAY_ICONS')),
         );
         $helper = new HelperForm();
@@ -257,9 +264,9 @@ class Payrexx extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
+            Configuration::updateValue('PAYREXX_PLATFORM', Tools::getValue('payrexx_platform'));
             Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
             Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
-            Configuration::updateValue('PAYREXX_USE_MODAL', Tools::getValue('payrexx_use_modal'));
             Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
         }
     }
@@ -318,16 +325,6 @@ class Payrexx extends PaymentModule
         $payment_option->setCallToActionText($action_text);
         $payment_option->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
 
-        if (!empty($this->context->cookie->payrexx_gateway_url)) {
-            $additionalModalCode = '
-                <a id="payrexx-gateway-modal" style="display: none;" data-href="' . $this->context->cookie->payrexx_gateway_url . '"></a>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-                <script src="https://media.payrexx.com/modal/v1/gateway.min.js"></script>
-                <script>jQuery(\'#payrexx-gateway-modal\').payrexxModal().click();</script>
-            ';
-            $this->context->cookie->payrexx_gateway_url = null;
-        }
-
         $payIcons = '';
         if ($payIconSource) {
             foreach ((array)$payIconSource as $iconSource) {
@@ -337,7 +334,7 @@ class Payrexx extends PaymentModule
             $payIcons = '<div class="payrexxPayIcons">' . $payIcons . '</div>';
         }
 
-        $payment_option->setAdditionalInformation($this->l('Payrexx payment method description') . $additionalModalCode . $payIcons);
+        $payment_option->setAdditionalInformation($this->l('Payrexx payment method description') . $payIcons);
 
         $payment_options = array(
             $payment_option,
