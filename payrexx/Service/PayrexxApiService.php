@@ -21,7 +21,8 @@ class PayrexxApiService
     private $apiKey;
     private $platform;
 
-    public function __construct($instanceName, $apiKey, $platform = '') {
+    public function __construct($instanceName, $apiKey, $platform = '')
+    {
         $this->instanceName = $instanceName;
         $this->apiKey = $apiKey;
         $this->platform = $platform;
