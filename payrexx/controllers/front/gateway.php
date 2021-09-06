@@ -105,8 +105,9 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
     {
         $prestaStatus = null;
         switch ($transactionStatus) {
-            case \Payrexx\Models\Response\Transaction::ERROR:
             case \Payrexx\Models\Response\Transaction::CANCELLED:
+            case \Payrexx\Models\Response\Transaction::DECLINED:
+            case \Payrexx\Models\Response\Transaction::ERROR:
             case \Payrexx\Models\Response\Transaction::EXPIRED:
                 $prestaStatus = 'PS_OS_ERROR';
                 break;
