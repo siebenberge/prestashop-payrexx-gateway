@@ -71,7 +71,7 @@ class PayrexxApiService
         }
     }
 
-    public function createPayrexxGateway(string $purpose, int $amount, string $currency, string $successRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
+    public function createPayrexxGateway(string $purpose, float $amount, string $currency, string $successRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
     {
 
         $payrexx = $this->getInterface();

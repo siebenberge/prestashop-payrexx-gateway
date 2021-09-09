@@ -27,6 +27,10 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $orderId = Order::getIdByCartId($cartId);
         $prestaStatus = $this->getPrestaStatus($requestStatus);
 
+        if (!$prestaStatus) {
+            die;
+        }
+
         if (!$orderId) {
             $this->createOrder($cartId, $prestaStatus, $transaction['amount']);
             die;
@@ -106,7 +110,6 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $prestaStatus = null;
         switch ($transactionStatus) {
             case \Payrexx\Models\Response\Transaction::CANCELLED:
-            case \Payrexx\Models\Response\Transaction::DECLINED:
             case \Payrexx\Models\Response\Transaction::ERROR:
             case \Payrexx\Models\Response\Transaction::EXPIRED:
                 $prestaStatus = 'PS_OS_ERROR';
