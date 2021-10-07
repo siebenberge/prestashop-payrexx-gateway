@@ -176,6 +176,10 @@ class Payrexx extends PaymentModule
                 'url' => 'shop-and-pay.com',
                 'name' => 'Shop and Pay',
             ],
+            [
+                'url' => 'ideal-pay.ch',
+                'name' => 'Ideal Pay',
+            ],
         ];
 
         $fields_form = [];
