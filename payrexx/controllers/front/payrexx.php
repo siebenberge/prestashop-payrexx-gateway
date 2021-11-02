@@ -10,9 +10,10 @@
  */
 
 require_once _PS_MODULE_DIR_ . '/payrexx/Service/PayrexxApiService.php';
+require_once _PS_MODULE_DIR_ . '/payrexx/controllers/front/validation.php';
+
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
-    const MODULE_NAME = 'payrexx';
 
     private $supportedLang = ['nl', 'fr', 'de', 'it', 'nl', 'pt', 'tr', 'pl', 'es', 'dk'];
     private $defaultLang = 'en';
@@ -38,15 +39,15 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
             $customer = $context->customer;
             $address = new Address($cart->id_address_delivery);
+            $country = Country::getIsoById($address->id_country);
 
             $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
             $currency = $context->currency->iso_code;
 
-            $successRedirectUrl = Context::getContext()->link
-                ->getModuleLink(self::MODULE_NAME, 'validation', array(), true);
-            $failedRedirectUrl = Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1';
+            $successRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', [], true);
+            $cancelRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_CANCEL], true);
+            $failedRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_FAIL], true);
             $currencyIsoCode = !empty($currency) ? $currency : 'USD';
-            $country = Country::getIsoById($address->id_country);
 
             $purpose = implode(', ', $productNames);
 
@@ -59,6 +60,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $total,
                 $currencyIsoCode,
                 $successRedirectUrl,
+                $cancelRedirectUrl,
                 $failedRedirectUrl,
                 $cart,
                 $customer,
@@ -79,7 +81,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
             Tools::redirect($gatewayUrl);
         } catch (\Payrexx\PayrexxException $e) {
-            Tools::redirect('index.php?controller=order&step=1');
+            Tools::redirect(Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_CONFIG], true));
         }
     }
 

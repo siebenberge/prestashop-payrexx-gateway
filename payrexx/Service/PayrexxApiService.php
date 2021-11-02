@@ -71,17 +71,55 @@ class PayrexxApiService
         }
     }
 
-    public function createPayrexxGateway(string $purpose, float $amount, string $currency, string $successRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
+    public function createPayrexxGateway(string $purpose, float $total, string $currency, string $successRedirectUrl, string $cancelRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
     {
+        $basket = [];
+        $basketAmount = 0;
+        foreach ($cart->getProducts() as $product) {
+            $productPrice = round($product['price_wt'] * 100, 0);
+            $basket[] = [
+                'name' => $product['name'],
+                'description' => $product['description_short'],
+                'quantity' => $product['quantity'],
+                'amount' => $productPrice,
+                'sku' => $product['reference'],
+            ];
+            $basketAmount += $productPrice * $product['quantity'];
+        }
+        if ($cart->getPackageShippingCost()) {
+            $shippingAmount = round($cart->getPackageShippingCost() * 100, 0);
+            $basket[] = [
+                'name' => 'Shipping',
+                'amount' => $shippingAmount,
+            ];
+            $basketAmount += $shippingAmount;
+        }
+
+        if ($cart->getDiscountSubtotalWithoutGifts()) {
+            $discountAmount = round($cart->getDiscountSubtotalWithoutGifts() * 100, 0);
+
+            $basket[] = [
+                'name' => 'Discount',
+                'amount' => -$discountAmount,
+            ];
+            $basketAmount -= $discountAmount;
+        }
 
         $payrexx = $this->getInterface();
 
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setPurpose($purpose);
-        $gateway->setAmount($amount * 100);
+
+        // Fallback for basket feature
+        if ($basketAmount === $total * 100) {
+            $gateway->setBasket($basket);
+        } else {
+            $gateway->setPurpose($purpose);
+        }
+
+        $gateway->setAmount($total * 100);
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($successRedirectUrl);
-        $gateway->setCancelRedirectUrl($failedRedirectUrl);
+        $gateway->setCancelRedirectUrl($cancelRedirectUrl);
         $gateway->setFailedRedirectUrl($failedRedirectUrl);
         $gateway->setPsp([]);
         $gateway->setReferenceId($cart->id);

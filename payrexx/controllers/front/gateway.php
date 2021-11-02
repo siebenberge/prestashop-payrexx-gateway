@@ -53,7 +53,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             Configuration::get('PAYREXX_API_SECRET'),
             Configuration::get('PAYREXX_PLATFORM')
         );
-        $gateway = $payrexxApiService->getPayrexxGateway((int)$cartId);
+        $gateway = $payrexxApiService->getPayrexxGateway((int)$transaction['invoice']['paymentRequestId']);
 
         // Validate request by gateway ID
         if (!$gateway) {
