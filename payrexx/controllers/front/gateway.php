@@ -9,50 +9,45 @@
  * @license MIT License
  */
 
-require_once _PS_MODULE_DIR_ . '/payrexx/Service/PayrexxApiService.php';
-
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
-
     public function initContent()
     {
+        $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
+
         $transaction = Tools::getValue('transaction');
         $cartId = $transaction['invoice']['referenceId'];
         $requestStatus = $transaction['status'];
+        $order = Order::getByCartId($cartId);
 
         if (!$this->validRequest($transaction, $cartId, $requestStatus)) {
             die;
         }
 
-        $orderId = Order::getIdByCartId($cartId);
-        $prestaStatus = $this->getPrestaStatus($requestStatus);
-
-        if (!$prestaStatus) {
+        if (!$prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($requestStatus)) {
             die;
         }
 
-        if (!$orderId) {
-            $this->createOrder($cartId, $prestaStatus, $transaction['amount']);
+        // Create order if transaction successful
+        if (!$order && in_array($requestStatus, [\Payrexx\Models\Response\Transaction::CONFIRMED, \Payrexx\Models\Response\Transaction::WAITING])) {
+            $payrexxOrderService->createOrder($cartId, $prestaStatus, $transaction['amount']);
             die;
         }
-
-        $this->updateOrderStatus($prestaStatus, $orderId);
+        if ($order) {
+            $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
+            die;
+        }
         die;
     }
 
-    private function validRequest($transaction, $cartId, $requestStatus)
+    private function validRequest($transaction, $cartId, $requestStatus): bool
     {
-
         // check required data
         if (!$cartId || !$requestStatus || !$transaction['id']) {
             return false;
         }
 
-        $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(
-            Configuration::get('PAYREXX_INSTANCE_NAME'),
-            Configuration::get('PAYREXX_API_SECRET'),
-            Configuration::get('PAYREXX_PLATFORM')
-        );
+        $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
         $gateway = $payrexxApiService->getPayrexxGateway((int)$transaction['invoice']['paymentRequestId']);
 
         // Validate request by gateway ID
@@ -74,75 +69,5 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         return true;
-    }
-
-    private function createOrder($cartId, $prestaStatus, $amount)
-    {
-        $payrexxModule = Module::getInstanceByName('payrexx');
-
-        $cart = new Cart($cartId);
-        $customer = new Customer($cart->id_customer);
-
-        $payrexxModule->validateOrder(
-            (int)$cartId,
-            (int)Configuration::get($prestaStatus),
-            (float)$amount / 100,
-            'Payrexx',
-            null,
-            array(),
-            (int)$cart->id_currency,
-            false,
-            $customer->secure_key
-        );
-    }
-
-    private function updateOrderStatus($prestaStatus, $orderId = null)
-    {
-        $objOrder = new Order($orderId);
-        $history = new OrderHistory();
-        $history->id_order = (int)$objOrder->id;
-        $history->changeIdOrderState(Configuration::get($prestaStatus), $objOrder, true);
-        $history->addWithemail();
-    }
-
-    private function getPrestaStatus($transactionStatus)
-    {
-        $prestaStatus = null;
-        switch ($transactionStatus) {
-            case \Payrexx\Models\Response\Transaction::CANCELLED:
-            case \Payrexx\Models\Response\Transaction::ERROR:
-            case \Payrexx\Models\Response\Transaction::EXPIRED:
-                $prestaStatus = 'PS_OS_ERROR';
-                break;
-            case \Payrexx\Models\Response\Transaction::REFUNDED:
-            case \Payrexx\Models\Response\Transaction::PARTIALLY_REFUNDED:
-                $prestaStatus = 'PS_OS_REFUND';
-                break;
-            case \Payrexx\Models\Response\Transaction::CONFIRMED:
-                $prestaStatus = 'PS_OS_PAYMENT';
-                break;
-            case \Payrexx\Models\Response\Transaction::WAITING:
-                $prestaStatus = 'PS_OS_BANKWIRE';
-                break;
-        }
-
-        return $prestaStatus;
-    }
-
-    /**
-     * Get Gateway id from the cart id
-     *
-     * @param int $id_cart cart id
-     * @return int
-     */
-    public static function getCartGatewayId($id_cart)
-    {
-        if (empty($id_cart)) {
-            return 0;
-        }
-
-        return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
-            WHERE id_cart = ' . (int)$id_cart);
     }
 }

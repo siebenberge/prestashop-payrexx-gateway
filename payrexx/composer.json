@@ -1,0 +1,24 @@
+{
+  "name": "payrexx/payrexxpaymentgateway",
+  "description": "A Prestashop plugin to accept payments with Payrexx",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Payrexx AG",
+      "homepage": "https://payrexx.com"
+    }
+  ],
+  "require": {
+    "php": "^7.2 || ^8",
+    "payrexx/payrexx": "^1.7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Payrexx\\PayrexxPaymentGateway\\": "src/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "type": "prestashop-module"
+}

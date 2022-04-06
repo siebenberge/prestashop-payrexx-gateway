@@ -9,12 +9,8 @@
  * @license MIT License
  */
 
-require_once _PS_MODULE_DIR_ . '/payrexx/Service/PayrexxApiService.php';
-require_once _PS_MODULE_DIR_ . '/payrexx/controllers/front/validation.php';
-
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
-
     private $supportedLang = ['nl', 'fr', 'de', 'it', 'nl', 'pt', 'tr', 'pl', 'es', 'dk'];
     private $defaultLang = 'en';
 
@@ -22,11 +18,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     {
         try {
             // Collect Gateway data
-            $payrexxApiService = new \PayrexxPaymentGateway\Service\PayrexxApiService(
-                Configuration::get('PAYREXX_INSTANCE_NAME'),
-                Configuration::get('PAYREXX_API_SECRET'),
-                Configuration::get('PAYREXX_PLATFORM')
-            );
+            $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
+            $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
             $context = Context::getContext();
 
             $cart = $context->cart;
@@ -45,13 +38,13 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $currency = $context->currency->iso_code;
 
             $successRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', [], true);
-            $cancelRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_CANCEL], true);
-            $failedRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_FAIL], true);
+            $cancelRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'cancel'], true);
+            $failedRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'fail'], true);
             $currencyIsoCode = !empty($currency) ? $currency : 'USD';
 
             $purpose = implode(', ', $productNames);
 
-            if ($gatewayId = static::getGatewayIdByForCartId($cart->id)) {
+            if ($gatewayId = $payrexxDbService->getCartGatewayId($cart->id)) {
                 $payrexxApiService->deletePayrexxGateway($gatewayId);
             }
 
@@ -69,7 +62,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             );
 
             $context->cookie->paymentId = $gateway->getId();
-            static::insertCartGatewayId($cart->id, $gateway->getId());
+            $payrexxDbService->insertCartGatewayId($cart->id, $gateway->getId());
             $lang = Language::getIsoById($context->cookie->id_lang);
 
             if (!in_array($lang, $this->supportedLang)) {
@@ -83,40 +76,5 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
         } catch (\Payrexx\PayrexxException $e) {
             Tools::redirect(Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_CONFIG], true));
         }
-    }
-
-    /**
-     *
-     * @param int $id_cart cart id
-     * @param int $id_gateway gateway id
-     * @return boolean
-     */
-    private static function insertCartGatewayId($id_cart, $id_gateway)
-    {
-        if (empty($id_cart) || empty($id_gateway)) {
-            return false;
-        }
-
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
-            INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`)
-            VALUES (' . (int)$id_cart . ',' . (int)$id_gateway . ')'
-            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int)$id_gateway . '
-        ');
-    }
-
-    /**
-     *
-     * @param int $id_cart cart id
-     * @return int
-     */
-    public static function getGatewayIdByForCartId($id_cart)
-    {
-        if (empty($id_cart)) {
-            return null;
-        }
-
-        return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-            SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
-            WHERE id_cart = ' . (int)$id_cart);
     }
 }

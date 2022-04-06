@@ -1,0 +1,13 @@
+# payrexx/config/services.yml
+services:
+  _defaults:
+    public: true
+
+  payrexx.payrexxpaymentgateway.payrexxdbservice:
+    class: Payrexx\PayrexxPaymentGateway\Service\PayrexxDbService
+
+  payrexx.payrexxpaymentgateway.payrexxapiservice:
+    class: Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService
+
+  payrexx.payrexxpaymentgateway.payrexxorderservice:
+    class: Payrexx\PayrexxPaymentGateway\Service\PayrexxOrderService
