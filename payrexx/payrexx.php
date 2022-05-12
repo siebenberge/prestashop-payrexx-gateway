@@ -4,8 +4,8 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author Payrexx <support@payrexx.com>
- * @copyright  2017 Payrexx
+ * @author Payrexx <integration@payrexx.com>
+ * @copyright  2022 Payrexx
  * @license MIT License
  */
 
