@@ -52,12 +52,12 @@ class PayrexxApiService
 
     public function getTransactionByGateway($payrexxGateway): ?\Payrexx\Models\Response\Transaction
     {
-        if (!in_array($payrexxGateway->getStatus(), ['confirmed', 'waiting'])) {
+        if (!in_array($payrexxGateway->getStatus(), [Transaction::CONFIRMED, Transaction::WAITING])) {
             return null;
         }
         $invoices = $payrexxGateway->getInvoices();
 
-        if (!$invoices || !$invoice = $invoices[0]) {
+        if (!$invoices || !$invoice = end($invoices)) {
             return null;
         }
 
