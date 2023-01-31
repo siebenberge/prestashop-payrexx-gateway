@@ -13,6 +13,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use \Payrexx\PayrexxPaymentGateway\Helper\PayrexxHelper;
+
 class Payrexx extends PaymentModule
 {
     public function __construct()
@@ -25,6 +27,7 @@ class Payrexx extends PaymentModule
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.6');
         $this->controllers = array('payment', 'validation', 'gateway');
+        $this->bootstrap = true;
 
         parent::__construct();
 
@@ -51,12 +54,10 @@ class Payrexx extends PaymentModule
             return false;
         }
 
-        if (!Configuration::updateValue('PAYREXX_PLATFORM', '')
-            || !Configuration::updateValue('PAYREXX_API_SECRET', '')
-            || !Configuration::updateValue('PAYREXX_INSTANCE_NAME', '')
-            || !Configuration::updateValue('PAYREXX_PAY_ICONS', '')
-        ) {
-            return false;
+        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+            if (!Configuration::updateValue($configKey, '')) {
+                return false;
+            }
         }
 
         return true;
@@ -94,12 +95,7 @@ class Payrexx extends PaymentModule
 
     public function uninstall()
     {
-        $config = array(
-            'PAYREXX_PLATFORM',
-            'PAYREXX_API_SECRET',
-            'PAYREXX_INSTANCE_NAME',
-            'PAYREXX_PAY_ICONS',
-        );
+        $config = PayrexxHelper::getConfigKeys();
         foreach ($config as $var) {
             Configuration::deleteByName($var);
         }
@@ -167,35 +163,25 @@ class Payrexx extends PaymentModule
             array('id_option' => 'alipay', 'name' => 'Alipay'),
         );
 
-        $platforms = [
-            [
-                'url' => 'payrexx.com',
-                'name' => 'Payrexx',
-            ],
-            [
-                'url' => 'shop-and-pay.com',
-                'name' => 'Shop and Pay',
-            ],
-            [
-                'url' => 'ideal-pay.ch',
-                'name' => 'Ideal Pay',
-            ],
-            [
-                'url' => 'payzzter.com',
-                'name' => 'Payzzter',
-            ],
-        ];
+        foreach (PayrexxHelper::getPlatforms() as $url => $platformName) {
+            $platforms[] = [
+                'url' => $url,
+                'name' => $platformName,
+            ];
+        }
 
         $fields_form = [];
         $fields_form[0]['form'] = [
             'legend' => [
                 'title' => $this->l('Settings'),
+                'icon' => 'icon-cogs',
             ],
             'input' => [
                 [
                     'type' => 'select',
-                    'label' => $this->l('Payment Icons'),
+                    'label' => $this->l('Payment Platform'),
                     'name' => 'payrexx_platform',
+                    'desc' => $this->l('Choose the platform provider from the list'),
                     'multiple' => false,
                     'options' => [
                         'query' => $platforms,
@@ -207,15 +193,15 @@ class Payrexx extends PaymentModule
                     'type' => 'text',
                     'label' => $this->l('API Secret'),
                     'name' => 'payrexx_api_secret',
+                    'desc' => $this->l('Paste here your API key from the Integrations page of your Payrexx merchant backend.'),
                     'required' => true
                 ],
                 [
                     'type' => 'text',
-                    'label' => $this->l('INSTANCE NAME') .
-                        "<br /><small style='color:#00f; font-weight:normal'>
-                            (INSTANCE NAME is a part of the url where you access your payrexx installation. 
-                            https://INSTANCE.payrexx.com)</small>",
+                    'label' => $this->l('INSTANCE NAME'),
                     'name' => 'payrexx_instance_name',
+                    'desc' => $this->l('INSTANCE NAME is a part of the url where you access your payrexx installation.
+                    https://INSTANCE.payrexx.com'),
                     'required' => true
                 ],
                 [
@@ -229,21 +215,43 @@ class Payrexx extends PaymentModule
                         'name' => 'name',
                     ]
                 ],
+                [
+                    'type' => 'text',
+                    'label' => $this->l('Look and Feel Profile Id'),
+                    'name' => 'payrexx_look_and_feel_id',
+                    'desc' => $this->l('Enter a profile ID if you wish to use a specific Look&Feel profile.'),
+                ],
+                [
+                    'type' => 'switch',
+                    'label' => $this->l('show/hide'),
+                    'name' => 'payrexx_status',
+                    'is_bool' => true,
+                    'values' => [
+                        [
+                            'id' => 'active_on',
+                            'value' => true,
+                            'label' => $this->l('Yes'),
+                        ],
+                        [
+                            'id' => 'active_off',
+                            'value' => false,
+                            'label' => $this->l('No'),
+                        ],
+                    ],
+                ],
             ],
             'submit' => [
                 'title' => $this->l('Save'),
                 'class' => 'btn btn-default pull-right'
             ],
         ];
-
-        $fields_value = array(
-            'payrexx_label' => $this->l('Payrexx payment method title'),
-            'payrexx_description' => $this->l('Payrexx payment method description'),
-            'payrexx_platform' => Configuration::get('PAYREXX_PLATFORM'),
-            'payrexx_api_secret' => Configuration::get('PAYREXX_API_SECRET'),
-            'payrexx_instance_name' => Configuration::get('PAYREXX_INSTANCE_NAME'),
-            'payrexx_pay_icons[]' => unserialize(Configuration::get('PAYREXX_PAY_ICONS')),
-        );
+        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+            if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
+                $fieldsValue[strtolower($configKey) . '[]'] = unserialize(Configuration::get($configKey));
+            } else {
+                $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
+            }
+        }
         $helper = new HelperForm();
         $helper->module = $this;
         $helper->name_controller = $this->name;
@@ -256,7 +264,7 @@ class Payrexx extends PaymentModule
         $helper->default_form_language = $default_lang;
         $helper->allow_employee_form_lang = $default_lang;
         $helper->tpl_vars = array(
-            'fields_value' => $fields_value,
+            'fields_value' => $fieldsValue,
             'id_language' => $this->context->language->id,
             'back_url' => $this->context->link->getAdminLink('AdminModules')
                 . '&configure=' . $this->name
@@ -272,10 +280,13 @@ class Payrexx extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
-            Configuration::updateValue('PAYREXX_PLATFORM', Tools::getValue('payrexx_platform'));
-            Configuration::updateValue('PAYREXX_API_SECRET', Tools::getValue('payrexx_api_secret'));
-            Configuration::updateValue('PAYREXX_INSTANCE_NAME', Tools::getValue('payrexx_instance_name'));
-            Configuration::updateValue('PAYREXX_PAY_ICONS', serialize(Tools::getValue('payrexx_pay_icons')));
+            foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+                $configValue = Tools::getValue(strtolower($configKey));
+                if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
+                    $configValue = serialize($configValue);
+                }
+                Configuration::updateValue($configKey, $configValue);
+            }
         }
     }
 
@@ -320,9 +331,21 @@ class Payrexx extends PaymentModule
         return $this->display(__FILE__, 'payrexx_payment.tpl');
     }
 
-    // Payment hook for version >= 1.7
+    /**
+     * Return payment options available for PS 1.7+
+     *
+     * @param array Hook parameters
+     *
+     * @return array|null
+     */
     public function hookPaymentOptions($params)
     {
+        if (Configuration::hasKey('PAYREXX_STATUS') &&
+            !Configuration::get('PAYREXX_STATUS')
+        ) {
+            return false;
+        }
+
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
