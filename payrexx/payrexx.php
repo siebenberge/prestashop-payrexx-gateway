@@ -336,14 +336,14 @@ class Payrexx extends PaymentModule
      *
      * @param array Hook parameters
      *
-     * @return array|null
+     * @return array
      */
     public function hookPaymentOptions($params)
     {
         if (Configuration::hasKey('PAYREXX_STATUS') &&
             !Configuration::get('PAYREXX_STATUS')
         ) {
-            return false;
+            return [];
         }
 
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
