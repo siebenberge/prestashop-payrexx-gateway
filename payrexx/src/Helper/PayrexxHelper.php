@@ -9,7 +9,7 @@ class PayrexxHelper
      *
      * @return array
      */
-    public static function getPlatforms()
+    public static function getPlatforms(): array
     {
         return [
             'payrexx.com' => 'Payrexx',
@@ -24,7 +24,7 @@ class PayrexxHelper
      *
      * @return array
      */
-    public static function getConfigKeys()
+    public static function getConfigKeys(): array
     {
         return [
             'PAYREXX_PLATFORM',
