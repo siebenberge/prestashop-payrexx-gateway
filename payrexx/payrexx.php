@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use \Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use \Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 
 class Payrexx extends PaymentModule
 {
@@ -263,12 +264,23 @@ class Payrexx extends PaymentModule
     {
         if (Tools::isSubmit('payrexx_config')) {
             foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
+                $payrexxApiService = new PayrexxApiService();
+                $signatureCheck = $payrexxApiService->validateSignature(
+                    Tools::getValue('payrexx_instance_name'),
+                    Tools::getValue('payrexx_api_secret'),
+                    Tools::getValue('payrexx_platform'),
+                );
+                if (!$signatureCheck) {
+                    $this->context->controller->errors[] = $this->l('Please enter valid credentials! Try again.');
+                    return false;
+                }
                 $configValue = Tools::getValue(strtolower($configKey));
                 if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                     $configValue = serialize($configValue);
                 }
                 Configuration::updateValue($configKey, $configValue);
             }
+            $this->context->controller->confirmations[] = $this->l('Settings are successfully updated.');
         }
     }
 
@@ -318,10 +330,14 @@ class Payrexx extends PaymentModule
      *
      * @param array Hook parameters
      *
-     * @return array
+     * @return array|null
      */
     public function hookPaymentOptions($params)
     {
+        if (!$this->credentialsCheck()) {
+            return [];
+        }
+
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
@@ -349,5 +365,20 @@ class Payrexx extends PaymentModule
         );
 
         return $payment_options;
+    }
+
+    /**
+     * Check the required credentials
+     *
+     * @return true|false
+     */
+    private function credentialsCheck(): bool
+    {
+        if (empty(Configuration::get('PAYREXX_API_SECRET')) || 
+            empty(Configuration::get('PAYREXX_INSTANCE_NAME'))
+        ) {
+            return false;
+        }
+        return true;
     }
 }

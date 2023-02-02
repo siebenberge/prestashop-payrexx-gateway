@@ -14,6 +14,7 @@ namespace Payrexx\PayrexxPaymentGateway\Service;
 use Configuration;
 use Payrexx\Models\Response\Gateway;
 use Payrexx\Models\Response\Transaction;
+use Payrexx\Models\Request\SignatureCheck;
 
 class PayrexxApiService
 {
@@ -39,7 +40,7 @@ class PayrexxApiService
             return null;
         }
 
-        $payrexx = $this->getInterface();
+        $payrexx = $this->getInterface($this->instanceName, $this->apiKey, $this->platform);
         $gateway = new \Payrexx\Models\Request\Gateway();
         $gateway->setId($gatewayId);
 
@@ -78,7 +79,7 @@ class PayrexxApiService
             return null;
         }
 
-        $payrexx = $this->getInterface();
+        $payrexx = $this->getInterface($this->instanceName, $this->apiKey, $this->platform);
         $transaction = new \Payrexx\Models\Request\Transaction();
         $transaction->setId($transactionId);
 
@@ -123,7 +124,7 @@ class PayrexxApiService
             $basketAmount -= $discountAmount;
         }
 
-        $payrexx = $this->getInterface();
+        $payrexx = $this->getInterface($this->instanceName, $this->apiKey, $this->platform);
 
         $gateway = new \Payrexx\Models\Request\Gateway();
 
@@ -169,7 +170,7 @@ class PayrexxApiService
 
     public function deletePayrexxGateway($gatewayId)
     {
-        $payrexx = $this->getInterface();
+        $payrexx = $this->getInterface($this->instanceName, $this->apiKey, $this->platform);
 
         $gateway = new \Payrexx\Models\Request\Gateway();
         $gateway->setId($gatewayId);
@@ -180,15 +181,35 @@ class PayrexxApiService
         }
     }
 
-    private function getInterface(): \Payrexx\Payrexx
+    /**
+     * Get payrexx object
+     *
+     * @param string $instance
+     * @param string $apiKey
+     * @param string $platform
+     * @return Payrexx
+     */
+    private function getInterface(string $instance, string $apiKey, string $platform): \Payrexx\Payrexx
     {
-        spl_autoload_register(function ($class) {
-            $root = _PS_MODULE_DIR_ . '/payrexx/controllers/front/payrexx-php-master';
-            $classFile = $root . '/lib/' . str_replace('\\', '/', $class) . '.php';
-            if (file_exists($classFile)) {
-                require_once $classFile;
-            }
-        });
-        return new \Payrexx\Payrexx($this->instanceName, $this->apiKey, '', $this->platform);
+        return new \Payrexx\Payrexx($instance, $apiKey, '', $platform);
+    }
+
+    /**
+     * validate the api signature
+     *
+     * @param string $instance
+     * @param string $apiKey
+     * @param string $platform
+     * @return true|false
+     */
+    public function validateSignature(string $instance, string $apiKey, string $platform): bool
+    {
+        $payrexx = $this->getInterface($instance, $apiKey, $platform);
+        try {
+            $payrexx->getOne(new SignatureCheck());
+            return true;
+        } catch (\Payrexx\PayrexxException $e) {
+            return false;
+        }
     }
 }
