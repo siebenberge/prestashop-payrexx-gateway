@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use \Payrexx\PayrexxPaymentGateway\Helper\PayrexxHelper;
+use \Payrexx\PayrexxPaymentGateway\Util\PayrexxHelper;
 
 class Payrexx extends PaymentModule
 {
@@ -221,24 +221,6 @@ class Payrexx extends PaymentModule
                     'name' => 'payrexx_look_and_feel_id',
                     'desc' => 'Enter a profile ID if you wish to use a specific Look&Feel profile.',
                 ],
-                [
-                    'type' => 'switch',
-                    'label' => 'show/hide',
-                    'name' => 'payrexx_status',
-                    'is_bool' => true,
-                    'values' => [
-                        [
-                            'id' => 'active_on',
-                            'value' => true,
-                            'label' => 'Yes',
-                        ],
-                        [
-                            'id' => 'active_off',
-                            'value' => false,
-                            'label' => 'No',
-                        ],
-                    ],
-                ],
             ],
             'submit' => [
                 'title' => 'Save',
@@ -340,12 +322,6 @@ class Payrexx extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        if (Configuration::hasKey('PAYREXX_STATUS') &&
-            !Configuration::get('PAYREXX_STATUS')
-        ) {
-            return [];
-        }
-
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();

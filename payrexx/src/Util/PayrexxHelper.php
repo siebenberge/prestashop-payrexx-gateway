@@ -1,6 +1,6 @@
 <?php
 
-namespace Payrexx\PayrexxPaymentGateway\Helper;
+namespace Payrexx\PayrexxPaymentGateway\Util;
 
 class PayrexxHelper
 {
@@ -32,7 +32,6 @@ class PayrexxHelper
             'PAYREXX_INSTANCE_NAME',
             'PAYREXX_PAY_ICONS',
             'PAYREXX_LOOK_AND_FEEL_ID',
-            'PAYREXX_STATUS',
         ];
     }
 }
