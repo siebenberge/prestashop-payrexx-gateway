@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use \Payrexx\PayrexxPaymentGateway\Helper\PayrexxHelper;
+use \Payrexx\PayrexxPaymentGateway\Util\PayrexxHelper;
 use \Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 
 class Payrexx extends PaymentModule
@@ -32,9 +32,9 @@ class Payrexx extends PaymentModule
 
         parent::__construct();
 
-        $this->displayName = $this->l('Payrexx');
-        $this->description = $this->l('Accept payments using Payrexx Payment gateway');
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        $this->displayName = 'Payrexx';
+        $this->description = 'Accept payments using Payrexx Payment gateway';
+        $this->confirmUninstall = 'Are you sure you want to uninstall?';
         $this->validateDb();
     }
 
@@ -174,15 +174,15 @@ class Payrexx extends PaymentModule
         $fields_form = [];
         $fields_form[0]['form'] = [
             'legend' => [
-                'title' => $this->l('Settings'),
+                'title' => 'Settings',
                 'icon' => 'icon-cogs',
             ],
             'input' => [
                 [
                     'type' => 'select',
-                    'label' => $this->l('Payment Platform'),
+                    'label' => 'Payment Platform',
                     'name' => 'payrexx_platform',
-                    'desc' => $this->l('Choose the platform provider from the list'),
+                    'desc' => 'Choose the platform provider from the list',
                     'multiple' => false,
                     'options' => [
                         'query' => $platforms,
@@ -192,22 +192,22 @@ class Payrexx extends PaymentModule
                 ],
                 [
                     'type' => 'text',
-                    'label' => $this->l('API Secret'),
+                    'label' => 'API Secret',
                     'name' => 'payrexx_api_secret',
-                    'desc' => $this->l('Paste here your API key from the Integrations page of your Payrexx merchant backend.'),
+                    'desc' => 'Paste here your API key from the Integrations page of your Payrexx merchant backend.',
                     'required' => true
                 ],
                 [
                     'type' => 'text',
-                    'label' => $this->l('INSTANCE NAME'),
+                    'label' => 'INSTANCE NAME',
                     'name' => 'payrexx_instance_name',
-                    'desc' => $this->l('INSTANCE NAME is a part of the url where you access your payrexx installation.
-                    https://INSTANCE.payrexx.com'),
+                    'desc' => 'INSTANCE NAME is a part of the url where you access your payrexx installation.
+                    https://INSTANCE.payrexx.com',
                     'required' => true
                 ],
                 [
                     'type' => 'select',
-                    'label' => $this->l('Payment Icons'),
+                    'label' => 'Payment Icons',
                     'name' => 'payrexx_pay_icons',
                     'multiple' => true,
                     'options' => [
@@ -218,31 +218,13 @@ class Payrexx extends PaymentModule
                 ],
                 [
                     'type' => 'text',
-                    'label' => $this->l('Look and Feel Profile Id'),
+                    'label' => 'Look and Feel Profile Id',
                     'name' => 'payrexx_look_and_feel_id',
-                    'desc' => $this->l('Enter a profile ID if you wish to use a specific Look&Feel profile.'),
-                ],
-                [
-                    'type' => 'switch',
-                    'label' => $this->l('show/hide'),
-                    'name' => 'payrexx_status',
-                    'is_bool' => true,
-                    'values' => [
-                        [
-                            'id' => 'active_on',
-                            'value' => true,
-                            'label' => $this->l('Yes'),
-                        ],
-                        [
-                            'id' => 'active_off',
-                            'value' => false,
-                            'label' => $this->l('No'),
-                        ],
-                    ],
+                    'desc' => 'Enter a profile ID if you wish to use a specific Look&Feel profile.',
                 ],
             ],
             'submit' => [
-                'title' => $this->l('Save'),
+                'title' => 'Save',
                 'class' => 'btn btn-default pull-right'
             ],
         ];
@@ -348,16 +330,11 @@ class Payrexx extends PaymentModule
      *
      * @param array Hook parameters
      *
-     * @return array|null
+     * @return array
      */
     public function hookPaymentOptions($params)
     {
-        if (!$this->credentialsCheck() ||
-            (
-                Configuration::hasKey('PAYREXX_STATUS') &&
-                !Configuration::get('PAYREXX_STATUS')
-            )
-        ) {
+        if (!$this->credentialsCheck()) {
             return [];
         }
 
