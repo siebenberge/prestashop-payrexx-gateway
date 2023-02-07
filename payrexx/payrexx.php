@@ -230,9 +230,9 @@ class Payrexx extends PaymentModule
         foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                 $fieldsValue[strtolower($configKey) . '[]'] = unserialize(Configuration::get($configKey));
-            } else {
-                $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
+                continue;
             }
+            $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
         }
         $helper = new HelperForm();
         $helper->module = $this;
