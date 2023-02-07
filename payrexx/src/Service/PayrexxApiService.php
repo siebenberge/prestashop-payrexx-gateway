@@ -144,6 +144,10 @@ class PayrexxApiService
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
 
+        if (Configuration::get('PAYREXX_LOOK_AND_FEEL_ID')) {
+            $gateway->setLookAndFeelProfile(Configuration::get('PAYREXX_LOOK_AND_FEEL_ID'));
+        }
+
         $gateway->addField('title', '');
         $gateway->addField('forename', $customer->firstname);
         $gateway->addField('surname', $customer->lastname);
