@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use \Payrexx\PayrexxPaymentGateway\Util\PayrexxHelper;
+use \Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 
 class Payrexx extends PaymentModule
 {
@@ -54,7 +54,7 @@ class Payrexx extends PaymentModule
             return false;
         }
 
-        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             if (!Configuration::updateValue($configKey, '')) {
                 return false;
             }
@@ -95,7 +95,7 @@ class Payrexx extends PaymentModule
 
     public function uninstall()
     {
-        $config = PayrexxHelper::getConfigKeys();
+        $config = ConfigurationUtil::getConfigKeys();
         foreach ($config as $var) {
             Configuration::deleteByName($var);
         }
@@ -163,7 +163,7 @@ class Payrexx extends PaymentModule
             array('id_option' => 'alipay', 'name' => 'Alipay'),
         );
 
-        foreach (PayrexxHelper::getPlatforms() as $url => $platformName) {
+        foreach (ConfigurationUtil::getPlatforms() as $url => $platformName) {
             $platforms[] = [
                 'url' => $url,
                 'name' => $platformName,
@@ -227,7 +227,7 @@ class Payrexx extends PaymentModule
                 'class' => 'btn btn-default pull-right'
             ],
         ];
-        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                 $fieldsValue[strtolower($configKey) . '[]'] = unserialize(Configuration::get($configKey));
             } else {
@@ -262,7 +262,7 @@ class Payrexx extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('payrexx_config')) {
-            foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+            foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
                 $configValue = Tools::getValue(strtolower($configKey));
                 if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                     $configValue = serialize($configValue);
