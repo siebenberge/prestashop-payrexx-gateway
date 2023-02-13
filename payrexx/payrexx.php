@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use \Payrexx\PayrexxPaymentGateway\Util\PayrexxHelper;
+use \Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 use \Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 
 class Payrexx extends PaymentModule
@@ -55,7 +55,7 @@ class Payrexx extends PaymentModule
             return false;
         }
 
-        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             if (!Configuration::updateValue($configKey, '')) {
                 return false;
             }
@@ -96,7 +96,7 @@ class Payrexx extends PaymentModule
 
     public function uninstall()
     {
-        $config = PayrexxHelper::getConfigKeys();
+        $config = ConfigurationUtil::getConfigKeys();
         foreach ($config as $var) {
             Configuration::deleteByName($var);
         }
@@ -164,7 +164,7 @@ class Payrexx extends PaymentModule
             array('id_option' => 'alipay', 'name' => 'Alipay'),
         );
 
-        foreach (PayrexxHelper::getPlatforms() as $url => $platformName) {
+        foreach (ConfigurationUtil::getPlatforms() as $url => $platformName) {
             $platforms[] = [
                 'url' => $url,
                 'name' => $platformName,
@@ -228,12 +228,12 @@ class Payrexx extends PaymentModule
                 'class' => 'btn btn-default pull-right'
             ],
         ];
-        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                 $fieldsValue[strtolower($configKey) . '[]'] = unserialize(Configuration::get($configKey));
-            } else {
-                $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
+                continue;
             }
+            $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
         }
         $helper = new HelperForm();
         $helper->module = $this;
@@ -272,18 +272,17 @@ class Payrexx extends PaymentModule
             Tools::getValue('payrexx_platform')
         );
         if (!$signatureCheck) {
-            $this->context->controller->errors[] = $this->l('Please enter valid credentials! Try again.');
+            $this->context->controller->errors[] = 'Please enter valid credentials! Try again.';
             return false;
         }
-        foreach (PayrexxHelper::getConfigKeys() as $configKey) {
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
             $configValue = Tools::getValue(strtolower($configKey));
             if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
                 $configValue = serialize($configValue);
             }
             Configuration::updateValue($configKey, $configValue);
         }
-        $this->context->controller->confirmations[] = $this->l('Settings are successfully updated.');
-
+        $this->context->controller->confirmations[] = 'Settings are successfully updated.';
     }
 
     // Payment hook for version < 1.7
@@ -336,10 +335,6 @@ class Payrexx extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        if (!$this->credentialsCheck()) {
-            return [];
-        }
-
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
         $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
@@ -367,20 +362,5 @@ class Payrexx extends PaymentModule
         );
 
         return $payment_options;
-    }
-
-    /**
-     * Check the required credentials
-     *
-     * @return true|false
-     */
-    private function credentialsCheck(): bool
-    {
-        if (empty(Configuration::get('PAYREXX_API_SECRET')) || 
-            empty(Configuration::get('PAYREXX_INSTANCE_NAME'))
-        ) {
-            return false;
-        }
-        return true;
     }
 }

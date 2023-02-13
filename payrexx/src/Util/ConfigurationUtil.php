@@ -2,7 +2,7 @@
 
 namespace Payrexx\PayrexxPaymentGateway\Util;
 
-class PayrexxHelper
+class ConfigurationUtil
 {
     /**
      * Get payrexx platforms.
