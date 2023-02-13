@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use \Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use \Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 
 class Payrexx extends PaymentModule
 {
@@ -261,15 +262,27 @@ class Payrexx extends PaymentModule
 
     private function postProcess()
     {
-        if (Tools::isSubmit('payrexx_config')) {
-            foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
-                $configValue = Tools::getValue(strtolower($configKey));
-                if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
-                    $configValue = serialize($configValue);
-                }
-                Configuration::updateValue($configKey, $configValue);
-            }
+        if (!Tools::isSubmit('payrexx_config')) {
+            return;
         }
+        $payrexxApiService = new PayrexxApiService();
+        $signatureCheck = $payrexxApiService->validateSignature(
+            Tools::getValue('payrexx_instance_name'),
+            Tools::getValue('payrexx_api_secret'),
+            Tools::getValue('payrexx_platform')
+        );
+        if (!$signatureCheck) {
+            $this->context->controller->errors[] = 'Please enter valid credentials! Try again.';
+            return false;
+        }
+        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
+            $configValue = Tools::getValue(strtolower($configKey));
+            if (in_array($configKey, ['PAYREXX_PAY_ICONS'])) {
+                $configValue = serialize($configValue);
+            }
+            Configuration::updateValue($configKey, $configValue);
+        }
+        $this->context->controller->confirmations[] = 'Settings are successfully updated.';
     }
 
     // Payment hook for version < 1.7
