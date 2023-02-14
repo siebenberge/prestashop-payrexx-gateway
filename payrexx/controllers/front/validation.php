@@ -36,7 +36,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
         // Redirect to success page if successful order already exists
         $order = Order::getByCartId($cartId);
-        if ($order && in_array($order->current_state, [2, 10])) {
+        if ($order && in_array($order->current_state, [2, 9, 10])) {
             Tools::redirect(
                 'index.php?controller=order-confirmation&id_cart=' . $cartId .
                 '&id_module=' . $this->module->id .
