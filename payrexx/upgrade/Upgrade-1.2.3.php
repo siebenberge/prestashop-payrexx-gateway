@@ -1,6 +1,6 @@
 <?php
 /**
- * upgrade the module
+ * Payrexx Payment Gateway - upgrade the module
  *
  * @author Payrexx <integration@payrexx.com>
  * @copyright  2023 Payrexx
