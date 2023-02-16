@@ -15,6 +15,7 @@ if (!defined('_PS_VERSION_')) {
 
 use \Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 use \Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
+use \PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class Payrexx extends PaymentModule
 {
@@ -51,7 +52,11 @@ class Payrexx extends PaymentModule
     public function install()
     {
         // Install default
-        if (!parent::install() || !$this->installDb() || !$this->registrationHook()) {
+        if (!parent::install() ||
+            !$this->installDb() ||
+            !$this->registrationHook() ||
+            !$this->installTab()
+        ) {
             return false;
         }
 
@@ -70,12 +75,7 @@ class Payrexx extends PaymentModule
      */
     private function installDb()
     {
-        return Db::getInstance()->execute('
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
-                id_cart INT(11) NOT NULL UNIQUE,
-                id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
-                PRIMARY KEY (`id_cart`)
-            ) DEFAULT CHARSET=utf8');
+        include dirname(__FILE__) . '/sql/install.php';
     }
 
     /**
@@ -94,6 +94,22 @@ class Payrexx extends PaymentModule
         return true;
     }
 
+    private function installTab() 
+    {
+        // Create new admin tab
+        $tab = new Tab();
+        $tab->id_parent = -1;
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Payment Methods';
+        }
+        $tab->class_name = 'AdminPayrexxPaymentMethods';
+        $tab->module = $this->name;
+        $tab->active = 1;
+
+        $tab->add();
+    }
+
     public function uninstall()
     {
         $config = ConfigurationUtil::getConfigKeys();
@@ -106,11 +122,27 @@ class Payrexx extends PaymentModule
             return false;
         }
 
+        // uninstall Tab
+        if (!$this->uninstallTab()) {
+            return false;
+        }
+
         // Uninstall default
         if (!parent::uninstall()) {
             return false;
         }
         return true;
+    }
+
+    public function uninstallTab()
+    {
+        $tabId = (int) Tab::getIdFromClassName('AdminPayrexxPaymentMethods');
+        if ($tabId) {
+            $tab = new Tab($tabId);
+            return $tab->delete();
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -119,7 +151,7 @@ class Payrexx extends PaymentModule
      */
     private function uninstallDb()
     {
-        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'payrexx_gateway`');
+        include dirname(__FILE__) . '/sql/uninstall.php'; 
     }
 
     public function getContent()
@@ -255,9 +287,84 @@ class Payrexx extends PaymentModule
                 . '&module_name=' . $this->name
                 . '#paypal_params'
         );
-        $form = $helper->generateForm($fields_form);
+        $form = $helper->generateForm($fields_form) . $this->renderAdditionalPaymentMethodsList();
 
         return $form;
+    }
+
+    /**
+     * Rendered payment method list.
+     */
+    protected function renderAdditionalPaymentMethodsList()
+    {
+        $this->fieldsList = [
+            'active' => [
+                'title' => 'Status',
+                'active' => 'status',
+                'type' => 'bool',
+                'search' => false,
+                'orderby' => false,
+            ],
+            'title' => [
+                'width' => 'auto',
+                'orderby' => false,
+                'title' => 'Title',
+                'type' => 'text',
+                'search' => false,
+            ],
+            'pm' => [
+                'title' => 'Payment Method',
+                'type' => 'text',
+                'search' => false,
+                'orderby' => false,
+            ],
+            'position' => [
+                'title' => 'Sorting',
+                'type' => 'text',
+                'search' => false,
+                'orderby' => false,
+            ],
+        ];
+
+        $linkToAdditionServiceController = Context::getContext()->link->getAdminLink('AdminPayrexxPaymentMethods', false);
+        $helperList = new HelperList();
+        $helperList->table = 'payrexx_payment_methods';
+        $helperList->shopLinkType = '';
+        $helperList->position_identifier = 'position';
+        $helperList->simple_header = false;
+        $helperList->identifier = 'id';
+        $helperList->actions = ['edit', 'delete'];
+        $helperList->show_toolbar = false;
+        $helperList->toolbar_btn['new'] = [
+           'href' => $linkToAdditionServiceController . '&addpayrexx_payment_methods&token=' . Tools::getAdminTokenLite('AdminPayrexxPaymentMethods'),
+           'desc' => 'Add new',
+        ];
+        $helperList->title = 'Payment Methods';
+        $helperList->currentIndex = $linkToAdditionServiceController;
+        $helperList->token = Tools::getAdminTokenLite('AdminPayrexxPaymentMethods');
+
+        $content = $this->getPaymentMethodsList(false);
+        $helperList->listTotal = count($content);
+
+        return $helperList->generateList($content, $this->fieldsList);
+    }
+
+    /**
+     * Get payment methods list.
+     * 
+     * @param bool $filterActive
+     * @return array
+     */
+    public function getPaymentMethodsList($filterActive = false ): array
+    {
+        $sql = new DbQuery();
+        $sql->select('*');
+        $sql->from('payrexx_payment_methods');
+        if ($filterActive) {
+            $sql->where('active = 1');
+        }
+        $sql->orderBy('position');
+        return Db::getInstance()->ExecuteS($sql);
     }
 
     private function postProcess()
@@ -337,13 +444,14 @@ class Payrexx extends PaymentModule
     {
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
-        $payment_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-        $action_text = $this->l('Payrexx payment method title');
+        $paymenOption = new PaymentOption();
+        $actionText = $this->l('Payrexx payment method title');
         $this->context->smarty->assign(array(
             'path' => $this->_path,
         ));
-        $payment_option->setCallToActionText($action_text);
-        $payment_option->setAction($this->context->link->getModuleLink($this->name, 'payrexx'));
+        $action = $this->context->link->getModuleLink($this->name, 'payrexx');
+        $paymenOption->setCallToActionText($actionText);
+        $paymenOption->setAction($action);
 
         $payIcons = '';
         if ($payIconSource) {
@@ -355,12 +463,53 @@ class Payrexx extends PaymentModule
             $payIcons = '<div class="payrexxPayIcons">' . $payIcons . '</div>';
         }
 
-        $payment_option->setAdditionalInformation($this->l('Payrexx payment method description') . $payIcons);
+        $paymenOption->setAdditionalInformation($this->l('Payrexx payment method description') . $payIcons);
+        $paymentMethods[] = $paymenOption;
 
-        $payment_options = array(
-            $payment_option,
-        );
+        foreach ($this->getPaymentMethodsList(true) as $paymentMethod) {
+            if (!$this->allowedPaymentMethodToPay($paymentMethod)) {
+                continue;
+            }
+            $paymenOption = new PaymentOption();
+            $paymenOption->setCallToActionText($paymentMethod['title']);
+            $paymenOption->setAction($action);
+            $paymenOption->setInputs([
+                'payment_methods' => [
+                    'name' =>'payrexx_pm',
+                    'type' =>'hidden',
+                    'value' => $paymentMethod['pm'],
+                ]
+            ]);
+            $paymentMethods[] = $paymenOption;
+        }
+        return $paymentMethods;
+    }
 
-        return $payment_options;
+    /**
+     * Allowed Payment Method to pay
+     *
+     * @param array $paymentMethod
+     * @return true|false
+     */
+    public function allowedPaymentMethodToPay(array $paymentMethod): bool
+    {
+        $allowedCountries = unserialize($paymentMethod['country']);
+        $allowedCurrencies = unserialize($paymentMethod['currency']);
+        $allowedCustomerGroups = unserialize($paymentMethod['customer_group']);
+        if (!empty($allowedCountries) && !in_array($this->context->country->id, $allowedCountries)) {
+            return false;
+        }
+        if (!empty($allowedCurrencies) && !in_array($this->context->currency->id, $allowedCurrencies)) {
+            return false;
+        }
+        if (!empty($allowedCustomerGroups) &&
+            empty(array_intersect(
+                $this->context->customer->getGroups(),
+                $allowedCustomerGroups
+            ))
+        ) {
+            return false;
+        }
+        return true;
     }
 }

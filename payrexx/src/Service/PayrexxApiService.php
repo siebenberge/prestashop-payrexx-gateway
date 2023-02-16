@@ -90,7 +90,17 @@ class PayrexxApiService
         }
     }
 
-    public function createPayrexxGateway(string $purpose, float $total, string $currency, string $successRedirectUrl, string $cancelRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
+    public function createPayrexxGateway(
+        string $purpose,
+        float $total,
+        string $currency,
+        array $redirectUrls,
+        $cart,
+        $customer,
+        $address,
+        string $country,
+        array $pm
+    ): ?Gateway
     {
         $basket = [];
         $basketAmount = 0;
@@ -138,10 +148,11 @@ class PayrexxApiService
         $gateway->setAmount($total * 100);
         $gateway->setVatRate($cart->getAverageProductsTaxRate() * 100);
         $gateway->setCurrency($currency);
-        $gateway->setSuccessRedirectUrl($successRedirectUrl);
-        $gateway->setCancelRedirectUrl($cancelRedirectUrl);
-        $gateway->setFailedRedirectUrl($failedRedirectUrl);
+        $gateway->setSuccessRedirectUrl($redirectUrls['success']);
+        $gateway->setCancelRedirectUrl($redirectUrls['cancel']);
+        $gateway->setFailedRedirectUrl($redirectUrls['failed']);
         $gateway->setPsp([]);
+        $gateway->setPm($pm);
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
 

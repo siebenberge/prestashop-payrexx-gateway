@@ -4,8 +4,8 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author Payrexx <support@payrexx.com>
- * @copyright  2017 Payrexx
+ * @author Payrexx <integration@payrexx.com>
+ * @copyright  2023 Payrexx
  * @license MIT License
  */
 
@@ -37,9 +37,11 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
             $currency = $context->currency->iso_code;
 
-            $successRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', [], true);
-            $cancelRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'cancel'], true);
-            $failedRedirectUrl = $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'fail'], true);
+            $redirectUrls = [
+                'success' => $context->link->getModuleLink($this->module->name, 'validation', [], true),
+                'cancel' => $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'cancel'], true),
+                'failed' => $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'fail'], true)
+            ];
             $currencyIsoCode = !empty($currency) ? $currency : 'USD';
 
             $purpose = implode(', ', $productNames);
@@ -48,17 +50,17 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $payrexxApiService->deletePayrexxGateway($gatewayId);
             }
 
+            $pm = !empty(Tools::getValue('payrexx_pm')) ? [Tools::getValue('payrexx_pm')] : [];
             $gateway = $payrexxApiService->createPayrexxGateway(
                 $purpose,
                 $total,
                 $currencyIsoCode,
-                $successRedirectUrl,
-                $cancelRedirectUrl,
-                $failedRedirectUrl,
+                $redirectUrls,
                 $cart,
                 $customer,
                 $address,
-                $country
+                $country,
+                $pm
             );
 
             $context->cookie->paymentId = $gateway->getId();
