@@ -17,6 +17,8 @@ class PayrexxPaymentMethods extends ObjectModel
 
     public $pm;
 
+    public $description;
+
     public $position;
 
     public $country;
@@ -38,6 +40,10 @@ class PayrexxPaymentMethods extends ObjectModel
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
                 'required' => true
+            ],
+            'description' => [
+                'type' => self::TYPE_STRING,
+                'validate' => 'isAnything',
             ],
             'pm' => [
                 'type' => self::TYPE_STRING,

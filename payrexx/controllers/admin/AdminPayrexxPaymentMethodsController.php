@@ -7,7 +7,7 @@
  * @license MIT License
  */
 
- include_once _PS_MODULE_DIR_ . 'payrexx/models/PayrexxPaymentMethods.php';
+include_once _PS_MODULE_DIR_ . 'payrexx/models/PayrexxPaymentMethods.php';
 
 use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 
@@ -27,24 +27,24 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         $this->className = 'PayrexxPaymentMethods';
         $this->fields_list = [
             'position' => [
-                'title' => $this->l('Position'),
-                'filter_key' => 'a!position',
+                'title' => 'Position',
+                'filter_key' => 'position',
                 'position' => 'position',
                 'align' => 'center',
                 'class' => 'fixed-width-md',
             ],
             'title' => [
+                'title' => 'Title',
                 'width' => 'auto',
                 'orderby' => false,
-                'title' => $this->l('Title'),
                 'type' => 'text',
                 'search' => false,
              ],
             'active' => [
+                'title' => 'Active',
                 'active' => 'status',
                 'width' => 'auto',
                 'orderby' => false,
-                'title' => $this->l('Active'),
                 'type' => 'bool',
                 'search' => false,
             ],
@@ -65,14 +65,14 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         $this->addRowAction('edit');
 
         $paymentMethod = $this->loadObject(true);
-        $this->fields_value['country[]'] = unserialize($paymentMethod->country);
-        $this->fields_value['currency[]'] = unserialize($paymentMethod->currency);
-        $this->fields_value['customer_group[]'] = unserialize($paymentMethod->customer_group);
+        foreach (['country', 'currency', 'customer_group'] as $fieldName) {
+            $this->fields_value[$fieldName . '[]'] = unserialize($paymentMethod->$fieldName);
+        }
 
-        foreach (ConfigurationUtil::getPaymentMethods() as $pmKey => $paymentMethod) {
+        foreach (ConfigurationUtil::getPaymentMethods() as $pm => $paymentMethod) {
             $paymentMethods[] = [
-                'id_pm' => $pmKey,
-                'name' => $paymentMethod
+                'id_pm' => $pm,
+                'name' => $paymentMethod,
             ];
         }
 
@@ -95,7 +95,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                 ],
                 [
                     'type' => 'select',
-                    'label' => ('Active'),
+                    'label' => 'Active',
                     'name' => 'active',
                     'required' => true,
                     'options' => [
@@ -113,12 +113,18 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                         'name' => 'name',
                     ],
                 ],
-
                 [
                     'name' => 'title',
                     'type' => 'text',
                     'label' => 'Title',
-                    'required' => true
+                    'required' => true,
+                    'placeholder' => 'Payment Title'
+                ],
+                [
+                    'name' => 'description',
+                    'type' => 'text',
+                    'label' => 'Description',
+                    'placeholder' => 'Payment Description',
                 ],
                 [
                     'type' => 'select',
@@ -135,7 +141,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                 ],
                 [
                     'type' => 'select',
-                    'label' => 'Currency',
+                    'label' => 'Payments Currency',
                     'name' => 'currency[]',
                     'multiple' => true,
                     'class' => 'chosen',
@@ -162,7 +168,8 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                 [
                     'name' => 'position',
                     'type' => 'text',
-                    'label' => 'Sorting'
+                    'label' => 'Sorting',
+                    'placeholder' => 'Sorting order',
                 ],
             ],
             'submit' => [
@@ -176,9 +183,13 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
     {
         // show saved messages
         if ($this->context->cookie->__isset('redirect_errors') &&
-            $this->context->cookie->__get('redirect_errors') != ''){
-
-            $this->errors = array_merge([$this->context->cookie->__get('redirect_errors')], $this->errors);
+            $this->context->cookie->__get('redirect_errors') != '') {
+            $this->errors = array_merge(
+                [
+                    $this->context->cookie->__get('redirect_errors')
+                ],
+                $this->errors
+            );
             // delete old messages
             $this->context->cookie->__unset('redirect_errors');
         }
@@ -218,7 +229,6 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
 
     public function initContent()
     {
-        // On Successful Endpoint creation, update, delete
         // Redirect to the Module page
         if (Tools::getValue('conf') == 3 || Tools::getValue('conf') == 1 || Tools::getValue('conf') == 4) {
             Tools::redirect(Context::getContext()->link->getAdminLink('AdminModules', true) . '&configure=payrexx&conf=' . Tools::getValue('conf'));

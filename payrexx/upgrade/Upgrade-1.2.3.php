@@ -19,6 +19,7 @@ function upgrade_module_1_2_3()
                 `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `active` tinyint DEFAULT NULL,
                 `title` varchar(255) DEFAULT NULL,
+                `description` varchar(255) DEFAULT NULL,
                 `pm` varchar(255) DEFAULT NULL,
                 `country` text,
                 `currency` text,

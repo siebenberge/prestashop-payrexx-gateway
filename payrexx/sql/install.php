@@ -20,6 +20,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods
     `active` tinyint DEFAULT NULL,
     `title` varchar(255) DEFAULT NULL,
     `pm` varchar(255) DEFAULT NULL,
+    `description` varchar(255) DEFAULT NULL,
     `country` text,
     `currency` text,
     `customer_group` text,
