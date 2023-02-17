@@ -36,17 +36,6 @@ class Payrexx extends PaymentModule
         $this->displayName = 'Payrexx';
         $this->description = 'Accept payments using Payrexx Payment gateway';
         $this->confirmUninstall = 'Are you sure you want to uninstall?';
-        $this->validateDb();
-    }
-
-    private function validateDb()
-    {
-        Db::getInstance()->execute('
-            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
-                id_cart INT(11) NOT NULL UNIQUE,
-                id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
-                PRIMARY KEY (`id_cart`)
-            ) DEFAULT CHARSET=utf8');
     }
 
     public function install()
@@ -94,7 +83,7 @@ class Payrexx extends PaymentModule
         return true;
     }
 
-    private function installTab() 
+    private function installTab()
     {
         // Create new admin tab
         $tab = new Tab();
@@ -137,17 +126,16 @@ class Payrexx extends PaymentModule
     public function uninstallTab()
     {
         $tabId = (int) Tab::getIdFromClassName('AdminPayrexxPaymentMethods');
-        if ($tabId) {
-            $tab = new Tab($tabId);
-            return $tab->delete();
-        } else {
-            return false;
+        if (!$tabId) {
+            return true;
         }
+        $tab = new Tab($tabId);
+        return $tab->delete();
     }
 
     /**
      * Uninstall DataBase table
-     * @return boolean if install was successfull
+     * @return boolean if uninstall was successfull
      */
     private function uninstallDb()
     {
@@ -326,7 +314,8 @@ class Payrexx extends PaymentModule
             ],
         ];
 
-        $linkToAdditionServiceController = Context::getContext()->link->getAdminLink('AdminPayrexxPaymentMethods', false);
+        $adminLinkController = Context::getContext()->link->getAdminLink('AdminPayrexxPaymentMethods', false);
+        $token = Tools::getAdminTokenLite('AdminPayrexxPaymentMethods');
         $helperList = new HelperList();
         $helperList->table = 'payrexx_payment_methods';
         $helperList->shopLinkType = '';
@@ -336,12 +325,12 @@ class Payrexx extends PaymentModule
         $helperList->actions = ['edit', 'delete'];
         $helperList->show_toolbar = false;
         $helperList->toolbar_btn['new'] = [
-           'href' => $linkToAdditionServiceController . '&addpayrexx_payment_methods&token=' . Tools::getAdminTokenLite('AdminPayrexxPaymentMethods'),
+           'href' => $adminLinkController . '&addpayrexx_payment_methods&token=' . $token,
            'desc' => 'Add new',
         ];
         $helperList->title = 'Payment Methods';
-        $helperList->currentIndex = $linkToAdditionServiceController;
-        $helperList->token = Tools::getAdminTokenLite('AdminPayrexxPaymentMethods');
+        $helperList->currentIndex = $adminLinkController;
+        $helperList->token = $token;
 
         $content = $this->getPaymentMethodsList(false);
         $helperList->listTotal = count($content);
@@ -351,11 +340,11 @@ class Payrexx extends PaymentModule
 
     /**
      * Get payment methods list.
-     * 
+     *
      * @param bool $filterActive
      * @return array
      */
-    public function getPaymentMethodsList($filterActive = false ): array
+    public function getPaymentMethodsList($filterActive = false): array
     {
         $sql = new DbQuery();
         $sql->select('*');
@@ -444,14 +433,14 @@ class Payrexx extends PaymentModule
     {
         $payIconSource = unserialize(Configuration::get('PAYREXX_PAY_ICONS'));
 
-        $paymenOption = new PaymentOption();
+        $paymentOption = new PaymentOption();
         $actionText = $this->l('Payrexx payment method title');
         $this->context->smarty->assign(array(
             'path' => $this->_path,
         ));
         $action = $this->context->link->getModuleLink($this->name, 'payrexx');
-        $paymenOption->setCallToActionText($actionText);
-        $paymenOption->setAction($action);
+        $paymentOption->setCallToActionText($actionText);
+        $paymentOption->setAction($action);
 
         $payIcons = '';
         if ($payIconSource) {
@@ -463,24 +452,28 @@ class Payrexx extends PaymentModule
             $payIcons = '<div class="payrexxPayIcons">' . $payIcons . '</div>';
         }
 
-        $paymenOption->setAdditionalInformation($this->l('Payrexx payment method description') . $payIcons);
-        $paymentMethods[] = $paymenOption;
+        $paymentOption->setAdditionalInformation($this->l('Payrexx payment method description') . $payIcons);
+        $paymentMethods[] = $paymentOption;
 
+        // Additional payment methods
         foreach ($this->getPaymentMethodsList(true) as $paymentMethod) {
             if (!$this->allowedPaymentMethodToPay($paymentMethod)) {
                 continue;
             }
-            $paymenOption = new PaymentOption();
-            $paymenOption->setCallToActionText($paymentMethod['title']);
-            $paymenOption->setAction($action);
-            $paymenOption->setInputs([
+            $paymentOption = new PaymentOption();
+            $paymentOption->setCallToActionText($paymentMethod['title']);
+            $paymentOption->setAction($action);
+
+            $paymentOption->setInputs([
                 'payment_methods' => [
                     'name' =>'payrexx_pm',
                     'type' =>'hidden',
                     'value' => $paymentMethod['pm'],
                 ]
             ]);
-            $paymentMethods[] = $paymenOption;
+
+            $paymentOption->setAdditionalInformation($paymentMethod['description']);
+            $paymentMethods[] = $paymentOption;
         }
         return $paymentMethods;
     }
