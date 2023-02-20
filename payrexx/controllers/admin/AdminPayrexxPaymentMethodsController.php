@@ -27,25 +27,18 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         $this->fields_list = [
             'position' => [
                 'title' => 'Position',
-                'filter_key' => 'position',
-                'position' => 'position',
                 'align' => 'center',
-                'class' => 'fixed-width-md',
             ],
             'title' => [
                 'title' => 'Title',
                 'width' => 'auto',
-                'orderby' => false,
                 'type' => 'text',
-                'search' => false,
              ],
             'active' => [
                 'title' => 'Active',
                 'active' => 'status',
                 'width' => 'auto',
-                'orderby' => false,
                 'type' => 'bool',
-                'search' => false,
             ],
         ];
         // Enable bootstrap
