@@ -7,13 +7,12 @@
  * @license MIT License
  */
 
-$sql = [];
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
-        id_cart INT(11) NOT NULL UNIQUE,
-        id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
-        PRIMARY KEY (`id_cart`)
-    ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+    id_cart INT(11) NOT NULL UNIQUE,
+    id_gateway INT(11) UNSIGNED DEFAULT "0" NOT NULL,
+    PRIMARY KEY (`id_cart`)
+) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods` (
     `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,

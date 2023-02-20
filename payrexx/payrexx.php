@@ -41,20 +41,12 @@ class Payrexx extends PaymentModule
     public function install()
     {
         // Install default
-        if (!parent::install() ||
-            !$this->installDb() ||
+        if (!$this->installDb() ||
             !$this->registrationHook() ||
             !$this->installTab()
         ) {
             return false;
         }
-
-        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
-            if (!Configuration::updateValue($configKey, '')) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -65,6 +57,7 @@ class Payrexx extends PaymentModule
     private function installDb()
     {
         include dirname(__FILE__) . '/sql/install.php';
+        return parent::install();
     }
 
     /**
@@ -96,7 +89,7 @@ class Payrexx extends PaymentModule
         $tab->module = $this->name;
         $tab->active = 1;
 
-        $tab->add();
+        return $tab->add();
     }
 
     public function uninstall()
@@ -115,22 +108,20 @@ class Payrexx extends PaymentModule
         if (!$this->uninstallTab()) {
             return false;
         }
-
-        // Uninstall default
-        if (!parent::uninstall()) {
-            return false;
-        }
         return true;
     }
 
     public function uninstallTab()
     {
-        $tabId = (int) Tab::getIdFromClassName('AdminPayrexxPaymentMethods');
+        $tabId = Tab::getIdFromClassName('AdminPayrexxPaymentMethods');
         if (!$tabId) {
             return true;
         }
         $tab = new Tab($tabId);
-        return $tab->delete();
+        if (!$tab->delete()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -139,7 +130,8 @@ class Payrexx extends PaymentModule
      */
     private function uninstallDb()
     {
-        include dirname(__FILE__) . '/sql/uninstall.php'; 
+        include dirname(__FILE__) . '/sql/uninstall.php';
+        return parent::uninstall();
     }
 
     public function getContent()

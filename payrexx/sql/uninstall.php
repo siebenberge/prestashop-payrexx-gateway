@@ -7,8 +7,6 @@
  * @license MIT License
  */
 
-$sql = [];
-
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway`;';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods`;';
 
