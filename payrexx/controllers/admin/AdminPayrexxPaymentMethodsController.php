@@ -7,7 +7,7 @@
  * @license MIT License
  */
 
-include_once _PS_MODULE_DIR_ . 'payrexx/models/PayrexxPaymentMethods.php';
+include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethods.php';
 
 use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 
@@ -19,7 +19,6 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
 {
     public function __construct()
     {
-        // Call of the parent constructor method
         parent::__construct();
 
         // Set variables

@@ -34,12 +34,12 @@ class PayrexxPaymentMethods extends ObjectModel
             'active' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isAnything',
-                'required' => true
+                'required' => true,
             ],
             'title' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
-                'required' => true
+                'required' => true,
             ],
             'description' => [
                 'type' => self::TYPE_STRING,
@@ -48,23 +48,23 @@ class PayrexxPaymentMethods extends ObjectModel
             'pm' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
-                'required'     => true
+                'required' => true,
             ],
             'position' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isUnsignedInt'
+                'validate' => 'isUnsignedInt',
             ],
             'country' => [
                 'type' => self::TYPE_STRING,
-                'validate' => 'isAnything'
+                'validate' => 'isAnything',
             ],
             'currency' => [
                 'type' => self::TYPE_STRING,
-                'validate' => 'isAnything'
+                'validate' => 'isAnything',
             ],
             'customer_group' => [
                 'type' => self::TYPE_STRING,
-                'validate' => 'isAnything'
+                'validate' => 'isAnything',
             ],
         ]
     ];
