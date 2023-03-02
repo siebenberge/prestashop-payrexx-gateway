@@ -2,11 +2,10 @@
 /**
  * Payrexx Payment Gateway.
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2023 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
-
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 

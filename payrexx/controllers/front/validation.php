@@ -8,7 +8,6 @@
  * @copyright  2017 Payrexx
  * @license MIT License
  */
-
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
     const ERROR_CONFIG = 'config';
@@ -17,8 +16,8 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     public function __construct()
     {
-        if (isset($_GET['payrexxError'])) {
-            $this->handleError($_GET['payrexxError']);
+        if (Tools::getIsset('payrexxError')) {
+            $this->handleError(Tools::getValue('payrexxError'));
         }
 
         parent::__construct();
@@ -71,7 +70,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     private function handleError($payrexxError)
     {
-        switch($payrexxError) {
+        switch ($payrexxError) {
             case self::ERROR_CONFIG:
                 $errMsg = 'The connection to the payment provider failed. Please contact the Shop owner';
                 break;

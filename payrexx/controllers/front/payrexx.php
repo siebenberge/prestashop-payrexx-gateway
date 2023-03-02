@@ -8,7 +8,6 @@
  * @copyright  2023 Payrexx
  * @license MIT License
  */
-
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
     private $supportedLang = ['nl', 'fr', 'de', 'it', 'nl', 'pt', 'tr', 'pl', 'es', 'dk'];
@@ -23,7 +22,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $context = Context::getContext();
 
             $cart = $context->cart;
-            $productNames = array();
+            $productNames = [];
             $products = $cart->getProducts();
             foreach ($products as $product) {
                 $quantity = $product['cart_quantity'] > 1 ? $product['cart_quantity'] . 'x ' : '';
@@ -34,13 +33,13 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $address = new Address($cart->id_address_delivery);
             $country = Country::getIsoById($address->id_country);
 
-            $total = (float)($cart->getOrderTotal(true, Cart::BOTH));
+            $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
             $currency = $context->currency->iso_code;
 
             $redirectUrls = [
                 'success' => $context->link->getModuleLink($this->module->name, 'validation', [], true),
                 'cancel' => $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'cancel'], true),
-                'failed' => $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'fail'], true)
+                'failed' => $context->link->getModuleLink($this->module->name, 'validation', ['payrexxError' => 'fail'], true),
             ];
             $currencyIsoCode = !empty($currency) ? $currency : 'USD';
 

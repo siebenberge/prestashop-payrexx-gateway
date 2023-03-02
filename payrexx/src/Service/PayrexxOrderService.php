@@ -1,13 +1,19 @@
 <?php
-
+/**
+ * Payrexx Payment Gateway.
+ *
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
+ */
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
-use Db;
-use Customer;
 use Cart;
 use Configuration;
-use Module;
 use Context;
+use Customer;
+use Db;
+use Module;
 use OrderHistory;
 
 class PayrexxOrderService
@@ -17,16 +23,16 @@ class PayrexxOrderService
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart($cartId);
         $customer = new Customer($cart->id_customer);
-        $statusId = (int)Configuration::get($prestaStatus);
+        $statusId = (int) Configuration::get($prestaStatus);
 
         $payrexxModule->validateOrder(
-            (int)$cart->id,
+            (int) $cart->id,
             $statusId,
-            (float)$amount / 100,
+            (float) $amount / 100,
             'Payrexx',
             null,
-            array(),
-            (int)$cart->id_currency,
+            [],
+            (int) $cart->id_currency,
             false,
             $customer->secure_key
         );
@@ -64,9 +70,10 @@ class PayrexxOrderService
         $orderHistory = new OrderHistory();
         $prestaStatusId = Configuration::get($prestaStatus);
 
-        $orderHistory->id_order = (int)$order->id;
+        $orderHistory->id_order = (int) $order->id;
         $orderHistory->changeIdOrderState($prestaStatusId, $order, true);
         $orderHistory->addWithemail();
+        $order->addOrderPayment($callback_amount, 'Zotapay', $callback->getOrderID());
     }
 
     /**
@@ -81,8 +88,8 @@ class PayrexxOrderService
             return 0;
         }
 
-        return (int)Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
-            WHERE id_cart = ' . (int)$id_cart);
+            WHERE id_cart = ' . (int) $id_cart);
     }
 }

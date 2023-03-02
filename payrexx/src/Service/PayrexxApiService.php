@@ -4,11 +4,10 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2019 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
-
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
 use Configuration;
@@ -32,6 +31,7 @@ class PayrexxApiService
     /**
      *
      * @param int $gatewayId
+     *
      * @return \Payrexx\Models\Response\Gateway|null
      */
     public function getPayrexxGateway($gatewayId): ?Gateway
@@ -139,7 +139,7 @@ class PayrexxApiService
         $gateway = new \Payrexx\Models\Request\Gateway();
 
         // Fallback for basket feature
-        if ((int)$basketAmount === (int)($total * 100)) {
+        if ((int) $basketAmount === (int) ($total * 100)) {
             $gateway->setBasket($basket);
         } else {
             $gateway->setPurpose($purpose);
