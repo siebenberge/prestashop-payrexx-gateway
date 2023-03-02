@@ -2,11 +2,10 @@
 /**
  * Payrexx Payment Gateway.
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2023 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
-
 include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethods.php';
 
 use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
@@ -24,23 +23,6 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         // Set variables
         $this->table = 'payrexx_payment_methods';
         $this->className = 'PayrexxPaymentMethods';
-        $this->fields_list = [
-            'position' => [
-                'title' => 'Position',
-                'align' => 'center',
-            ],
-            'title' => [
-                'title' => 'Title',
-                'width' => 'auto',
-                'type' => 'text',
-             ],
-            'active' => [
-                'title' => 'Active',
-                'active' => 'status',
-                'width' => 'auto',
-                'type' => 'bool',
-            ],
-        ];
         // Enable bootstrap
         $this->bootstrap = true;
         $this->_orderBy = 'id';
@@ -60,63 +42,30 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         foreach (['country', 'currency', 'customer_group'] as $fieldName) {
             $this->fields_value[$fieldName . '[]'] = unserialize($paymentMethod->$fieldName);
         }
-
-        foreach (ConfigurationUtil::getPaymentMethods() as $pm => $paymentMethod) {
-            $paymentMethods[] = [
-                'id_pm' => $pm,
-                'name' => $paymentMethod,
-            ];
-        }
-
+        $configPaymentMethods = ConfigurationUtil::getPaymentMethods();
+        $pageTitle = $this->l($configPaymentMethods[$paymentMethod->pm]);
         $this->fields_form = [
             'legend' => [
-                'title' => 'Payment Method',
+                'title' => $pageTitle,
                 'icon' => 'icon-list-ul',
             ],
             'input' => [
                 [
-                    'type' => 'select',
-                    'label' => 'Payment Method',
-                    'name' => 'pm',
-                    'required' => true,
-                    'options' => [
-                        'query' => $paymentMethods,
-                        'id' => 'id_pm',
-                        'name' => 'name',
-                    ],
-                ],
-                [
-                    'type' => 'select',
+                    'type' => 'switch',
                     'label' => 'Active',
                     'name' => 'active',
-                    'required' => true,
-                    'options' => [
-                        'query' => [
-                            [
-                                'idevents' => 1,
-                                'name' => 'Active',
-                            ],
-                            [
-                                'idevents' => 0,
-                                'name' => 'Inactive',
-                            ],
+                    'values' => [
+                        [
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->trans('Yes', [], 'Admin.Global'),
                         ],
-                        'id' => 'idevents',
-                        'name' => 'name',
+                        [
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->trans('No', [], 'Admin.Global'),
+                        ],
                     ],
-                ],
-                [
-                    'name' => 'title',
-                    'type' => 'text',
-                    'label' => 'Title',
-                    'required' => true,
-                    'placeholder' => 'Payment Title'
-                ],
-                [
-                    'name' => 'description',
-                    'type' => 'text',
-                    'label' => 'Description',
-                    'placeholder' => 'Payment Description',
                 ],
                 [
                     'type' => 'select',
@@ -129,7 +78,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                         'query' => Country::getCountries($this->context->language->id),
                         'id' => 'id_country',
                         'name' => 'name',
-                    ]
+                    ],
                 ],
                 [
                     'type' => 'select',
@@ -142,7 +91,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                         'query' => Currency::getCurrencies(false, false),
                         'id' => 'id',
                         'name' => 'name',
-                    ]
+                    ],
                 ],
                 [
                     'type' => 'select',
@@ -155,7 +104,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                         'query' => Group::getGroups($this->context->language->id),
                         'id' => 'id_group',
                         'name' => 'name',
-                    ]
+                    ],
                 ],
                 [
                     'name' => 'position',
@@ -171,6 +120,9 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function display()
     {
         // show saved messages
@@ -178,9 +130,9 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
             $this->context->cookie->__get('redirect_errors') != '') {
             $this->errors = array_merge(
                 [
-                    $this->context->cookie->__get('redirect_errors')
+                    $this->context->cookie->__get('redirect_errors'),
                 ],
-                $this->errors
+                $this->errors,
             );
             // delete old messages
             $this->context->cookie->__unset('redirect_errors');
@@ -188,6 +140,9 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         parent::display();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function postProcess()
     {
         if (!Tools::isSubmit('submit_form_pm')) {
@@ -196,29 +151,38 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         }
 
         // Country
-        $postCountry = !isset($_POST['country'])? [] : $_POST['country'];
+        $postCountry = !Tools::getIsset('country') ? [] : Tools::getValue('country');
         $_POST['country'] = serialize($postCountry);
 
         // currency
-        $postCurrency = !isset($_POST['currency'])? [] : $_POST['currency'];
+        $postCurrency = !Tools::getIsset('currency') ? [] : Tools::getValue('currency');
         $_POST['currency'] = serialize($postCurrency);
 
-        $postCustomerGroup = !isset($_POST['customer_group'])? [] : $_POST['customer_group'];
+        $postCustomerGroup = !Tools::getIsset('customer_group') ? [] : Tools::getValue('customer_group');
         $_POST['customer_group'] = serialize($postCustomerGroup);
 
         parent::postProcess();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function renderList()
     {
         parent::renderList();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function init()
     {
         parent::init();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function initContent()
     {
         // Redirect to the Module page

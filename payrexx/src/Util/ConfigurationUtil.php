@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * Payrexx Payment Gateway.
+ *
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
+ */
 namespace Payrexx\PayrexxPaymentGateway\Util;
 
 class ConfigurationUtil
@@ -30,7 +36,6 @@ class ConfigurationUtil
             'PAYREXX_PLATFORM',
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
-            'PAYREXX_PAY_ICONS',
             'PAYREXX_LOOK_AND_FEEL_ID',
         ];
     }
@@ -46,10 +51,10 @@ class ConfigurationUtil
             'masterpass' => 'Masterpass',
             'mastercard' => 'Mastercard',
             'visa' => 'Visa',
-            'apple_pay' => 'Apple Pay',
+            'apple-pay' => 'Apple Pay',
             'maestro' => 'Maestro',
             'jcb' => 'JCB',
-            'american_express' => 'American Express',
+            'american-express' => 'American Express',
             'wirpay' => 'WIRpay',
             'paypal' => 'PayPal',
             'bitcoin' => 'Bitcoin',
@@ -59,24 +64,24 @@ class ConfigurationUtil
             'bonuscard' => 'Bonus card',
             'cashu' => 'CashU',
             'cb' => 'Carte Bleue',
-            'diners_club' => 'Diners Club',
-            'sepa_direct_debit' => 'Direct Debit',
+            'diners-club' => 'Diners Club',
+            'sepa-direct-debit' => 'Direct Debit',
             'discover' => 'Discover',
             'elv' => 'ELV',
             'ideal' => 'iDEAL',
             'invoice' => 'Invoice',
             'myone' => 'My One',
             'paysafecard' => 'Paysafe Card',
-            'post_finance_card' => 'PostFinance Card',
-            'post_finance_e_finance' => 'PostFinance E-Finance',
+            'post-finance-card' => 'PostFinance Card',
+            'post-finance-e-finance' => 'PostFinance E-Finance',
             'swissbilling' => 'SwissBilling',
             'twint' => 'TWINT',
             'barzahlen' => 'Barzahlen/Viacash',
             'bancontact' => 'Bancontact',
             'giropay' => 'GiroPay',
             'eps' => 'EPS',
-            'google_pay' => 'Google Pay',
-            'wechat_pay' => 'WeChat Pay',
+            'google-pay' => 'Google Pay',
+            'wechat-pay' => 'WeChat Pay',
             'alipay' => 'Alipay',
         ];
     }

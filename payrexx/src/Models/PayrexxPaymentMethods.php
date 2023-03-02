@@ -2,22 +2,17 @@
 /**
  * Payrexx Payment Methods
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2023 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
-
 class PayrexxPaymentMethods extends ObjectModel
 {
     public $id;
 
     public $active;
 
-    public $title;
-
     public $pm;
-
-    public $description;
 
     public $position;
 
@@ -33,20 +28,6 @@ class PayrexxPaymentMethods extends ObjectModel
         'fields' => [
             'active' => [
                 'type' => self::TYPE_BOOL,
-                'validate' => 'isAnything',
-                'required' => true,
-            ],
-            'title' => [
-                'type' => self::TYPE_STRING,
-                'validate' => 'isAnything',
-                'required' => true,
-            ],
-            'description' => [
-                'type' => self::TYPE_STRING,
-                'validate' => 'isAnything',
-            ],
-            'pm' => [
-                'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
                 'required' => true,
             ],
@@ -66,6 +47,6 @@ class PayrexxPaymentMethods extends ObjectModel
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
             ],
-        ]
+        ],
     ];
 }
