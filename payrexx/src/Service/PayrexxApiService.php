@@ -11,9 +11,9 @@
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
 use Configuration;
+use Payrexx\Models\Request\SignatureCheck;
 use Payrexx\Models\Response\Gateway;
 use Payrexx\Models\Response\Transaction;
-use Payrexx\Models\Request\SignatureCheck;
 
 class PayrexxApiService
 {
@@ -29,7 +29,6 @@ class PayrexxApiService
     }
 
     /**
-     *
      * @param int $gatewayId
      *
      * @return \Payrexx\Models\Response\Gateway|null
@@ -51,7 +50,7 @@ class PayrexxApiService
         return null;
     }
 
-    public function getTransactionByGateway($payrexxGateway): ?\Payrexx\Models\Response\Transaction
+    public function getTransactionByGateway($payrexxGateway): ?Transaction
     {
         if (!in_array($payrexxGateway->getStatus(), [Transaction::CONFIRMED, Transaction::WAITING])) {
             return null;
@@ -71,7 +70,7 @@ class PayrexxApiService
 
     /**
      * @param int $transactionId
-     * @return \Payrexx\Models\Request\Transaction|NULL
+     * @return \Payrexx\Models\Response\Transaction|null
      */
     public function getPayrexxTransaction($transactionId): ?Transaction
     {
@@ -100,8 +99,7 @@ class PayrexxApiService
         $address,
         string $country,
         array $pm
-    ): ?Gateway
-    {
+    ): ?Gateway {
         $basket = [];
         $basketAmount = 0;
         foreach ($cart->getProducts() as $product) {

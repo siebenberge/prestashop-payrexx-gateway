@@ -26,8 +26,8 @@ class PayrexxDbService
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
             INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`)
             VALUES (' . (int) $idCart . ',' . (int) $idGateway . ')'
-            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway . '
-        ');
+            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway
+        );
     }
 
     /**
@@ -49,7 +49,7 @@ class PayrexxDbService
      * @param int $idGateway cart id
      * @return int
      */
-    public function getGatewayCartId($id_gateway)
+    public function getGatewayCartId($idGateway)
     {
         if (empty($idGateway)) {
             return null;
