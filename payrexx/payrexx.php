@@ -298,17 +298,14 @@ class Payrexx extends PaymentModule
             $title = $configPaymentMethods[$paymentMethod['pm']];
             $img = $this->_path . 'views/img/cardicons/card_' . str_replace('-', '_', $paymentMethod['pm']) . '.svg';
 
-            $this->smarty->assign(['action' => $action, 'image' => $img]);
-            $paymentForm = $this->fetch('module:payrexx/views/templates/hook/payment_options.tpl');
-
             $paymentOption = new PaymentOption();
-            $paymentOption->setForm($paymentForm);
             $paymentOption->setAction($action);
             $paymentOption->setCallToActionText($this->l($title));
+            $paymentOption->setAdditionalInformation('<img src=' . $img . ' width=100>' );
             $paymentOption->setInputs(
                 [
-                    'payment_methods' => [
-                        'name' => 'payrexx_pm',
+                    'pm' => [
+                        'name' => 'payrexxPaymentMethod',
                         'type' => 'hidden',
                         'value' => $paymentMethod['pm'],
                     ],

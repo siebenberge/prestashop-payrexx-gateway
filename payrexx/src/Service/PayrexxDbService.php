@@ -15,17 +15,19 @@ class PayrexxDbService
     /**
      * @param int $idCart cart id
      * @param int $idGateway gateway id
+     * @param string $paymentMethod Payment method
      * @return bool
      */
-    public function insertCartGatewayId($idCart, $idGateway)
+    public function insertGatewayInfo($idCart, $idGateway, $paymentMethod)
     {
-        if (empty($idCart) || empty($id_gateway)) {
+        if (empty($idCart) || empty($idGateway)) {
             return false;
         }
+        $paymentMethod = empty($paymentMethod) ? 'payrexx' : $paymentMethod;
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
-            INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`)
-            VALUES (' . (int) $idCart . ',' . (int) $idGateway . ')'
+            INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`, `pm`)
+            VALUES (' . (int) $idCart . ',' . (int) $idGateway . ',\'' . $paymentMethod . '\')'
             . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway
         );
     }
@@ -58,6 +60,22 @@ class PayrexxDbService
         return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_cart FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_gateway = ' . (int) $idGateway
+        );
+    }
+
+    /**
+     * @param int $idCart cart id
+     * @return string
+     */
+    public function getPaymentMethodByCartId($idCart): string
+    {
+        if (empty($idCart)) {
+            return '';
+        }
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT pm FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
+            WHERE id_cart = ' . (int) $idCart
         );
     }
 }

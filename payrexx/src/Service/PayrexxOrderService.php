@@ -18,7 +18,7 @@ use OrderHistory;
 
 class PayrexxOrderService
 {
-    public function createOrder($cartId, $prestaStatus, $amount)
+    public function createOrder($cartId, $prestaStatus, $amount, $paymentMethod)
     {
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart($cartId);
@@ -29,7 +29,7 @@ class PayrexxOrderService
             (int) $cart->id,
             $statusId,
             (float) $amount / 100,
-            'Payrexx',
+            $paymentMethod,
             null,
             [],
             (int) $cart->id_currency,
@@ -73,7 +73,6 @@ class PayrexxOrderService
         $orderHistory->id_order = (int) $order->id;
         $orderHistory->changeIdOrderState($prestaStatusId, $order, true);
         $orderHistory->addWithemail();
-        $order->addOrderPayment($callback_amount, 'Zotapay', $callback->getOrderID());
     }
 
     /**

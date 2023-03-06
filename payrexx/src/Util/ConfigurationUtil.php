@@ -85,4 +85,16 @@ class ConfigurationUtil
             'alipay' => 'Alipay',
         ];
     }
+
+    /**
+     * @param string $pmIdentifier payment method key
+     */
+    public static function getPaymentMethodNameByIdentifier(string $pmIdentifier):string
+    {
+        if (empty($pmIdentifier) || $pmIdentifier === 'payrexx') {
+            return 'Payrexx';
+        }
+        $paymentMethods = static::getPaymentMethods();
+        return $paymentMethods[$pmIdentifier] . ' by payrexx';
+    }
 }

@@ -1,13 +1,13 @@
 <?php
 /**
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- * @author Payrexx <support@payrexx.com>
- * @copyright  2017 Payrexx
- * @license MIT License
+ * Payrexx Validation Module FrontController
+ * 
+ * @author    Payrexx <support@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
+use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
     const ERROR_CONFIG = 'config';
@@ -51,9 +51,17 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             return;
         }
 
+        $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
+        $paymentMethod = ConfigurationUtil::getPaymentMethodNameByIdentifier($pm);
+
         // Create order
         $prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($transaction->getStatus());
-        $payrexxOrderService->createOrder($cartId, $prestaStatus, $transaction->getAmount());
+        $payrexxOrderService->createOrder(
+            $cartId,
+            $prestaStatus,
+            $transaction->getAmount(),
+            $paymentMethod
+        );
 
         // Redirect to confirmation page if order creation was successful
         if ($order = Order::getByCartId($cartId)) {

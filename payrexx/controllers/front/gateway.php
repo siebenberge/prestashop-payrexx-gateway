@@ -8,11 +8,15 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use Payrexx\Models\Response\Transaction;
+
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
     public function initContent()
     {
         $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
+        $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
 
         $transaction = Tools::getValue('transaction');
         $cartId = $transaction['invoice']['referenceId'];
@@ -27,16 +31,24 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             exit;
         }
 
+        $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
+        $paymentMethod = ConfigurationUtil::getPaymentMethodNameByIdentifier($pm);
+
         // Create order if transaction successful
-        if (!$order && in_array($requestStatus, [\Payrexx\Models\Response\Transaction::CONFIRMED, \Payrexx\Models\Response\Transaction::WAITING])) {
-            $payrexxOrderService->createOrder($cartId, $prestaStatus, $transaction['amount']);
+        if (!$order && in_array($requestStatus, [Transaction::CONFIRMED, Transaction::WAITING])) {
+            $payrexxOrderService->createOrder(
+                $cartId,
+                $prestaStatus,
+                $transaction['amount'],
+                $paymentMethod
+            );
             exit;
         }
 
         // Update status if current status is not final
         if ($order && $order->current_state !== 2) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
-            $order->addOrderPayment($transaction['amount'], 'Payrexx', $transaction['id']);
+            $order->addOrderPayment($transaction['amount'], $paymentMethod, $transaction['id']);
             exit;
         }
         exit;
