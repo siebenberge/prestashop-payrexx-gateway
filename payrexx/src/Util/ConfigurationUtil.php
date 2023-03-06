@@ -88,13 +88,17 @@ class ConfigurationUtil
 
     /**
      * @param string $pmIdentifier payment method key
+     * @return string
      */
-    public static function getPaymentMethodNameByIdentifier(string $pmIdentifier):string
+    public static function getPaymentMethodNameByIdentifier(string $pmIdentifier): string
     {
-        if (empty($pmIdentifier) || $pmIdentifier === 'payrexx') {
+        $paymentMethods = static::getPaymentMethods();
+        if (empty($pmIdentifier) ||
+            $pmIdentifier === 'payrexx' ||
+            !isset($paymentMethods[$pmIdentifier])
+        ) {
             return 'Payrexx';
         }
-        $paymentMethods = static::getPaymentMethods();
         return $paymentMethods[$pmIdentifier] . ' by payrexx';
     }
 }

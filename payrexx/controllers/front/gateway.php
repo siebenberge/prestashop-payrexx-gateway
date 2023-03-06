@@ -8,8 +8,8 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 use Payrexx\Models\Response\Transaction;
+use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
 
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {

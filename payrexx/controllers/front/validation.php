@@ -1,7 +1,7 @@
 <?php
 /**
  * Payrexx Validation Module FrontController
- * 
+ *
  * @author    Payrexx <support@payrexx.com>
  * @copyright 2023 Payrexx
  * @license   MIT License

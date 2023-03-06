@@ -301,7 +301,7 @@ class Payrexx extends PaymentModule
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
             $paymentOption->setCallToActionText($this->l($title));
-            $paymentOption->setAdditionalInformation('<img src=' . $img . ' width=100>' );
+            $paymentOption->setAdditionalInformation('<img src=' . $img . ' width=100>');
             $paymentOption->setInputs(
                 [
                     'pm' => [
