@@ -91,7 +91,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                 break;
         }
 
-        $this->errors[] = Tools::displayError($errMsg);
+        $this->errors[] = $errMsg;
         $this->redirectWithNotifications('index.php?controller=order&step=1');
     }
 }

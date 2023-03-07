@@ -1,8 +1,6 @@
 <?php
 /**
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
+ * Payrexx FrontController
  *
  * @author Payrexx <integration@payrexx.com>
  * @copyright  2023 Payrexx
@@ -61,6 +59,9 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $pm
             );
 
+            if (!$gateway) {
+                throw new \Payrexx\PayrexxException();
+            }
             $context->cookie->paymentId = $gateway->getId();
             $payrexxDbService->insertGatewayInfo(
                 $cart->id,
@@ -78,7 +79,16 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 
             Tools::redirect($gatewayUrl);
         } catch (\Payrexx\PayrexxException $e) {
-            Tools::redirect(Context::getContext()->link->getModuleLink(self::MODULE_NAME, 'validation', ['payrexxError' => PayrexxValidationModuleFrontController::ERROR_CONFIG], true));
+            Tools::redirect(
+                Context::getContext()->link->getModuleLink(
+                    $this->module->name,
+                    'validation',
+                    [
+                        'payrexxError' => 'config',
+                    ],
+                    true,
+                )
+            );
         }
     }
 }
