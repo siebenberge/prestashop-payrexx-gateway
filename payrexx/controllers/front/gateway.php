@@ -32,7 +32,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
-        $paymentMethod = PayrexxConfig::getPaymentMethodNameByIdentifier($pm);
+        $paymentMethod = PayrexxConfig::getPaymentMethodNameByPm($pm);
 
         // Create order if transaction successful
         if (!$order && in_array($requestStatus, [Transaction::CONFIRMED, Transaction::WAITING])) {

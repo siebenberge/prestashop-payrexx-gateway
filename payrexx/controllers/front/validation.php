@@ -52,7 +52,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         }
 
         $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
-        $paymentMethod = PayrexxConfig::getPaymentMethodNameByIdentifier($pm);
+        $paymentMethod = PayrexxConfig::getPaymentMethodNameByPm($pm);
 
         // Create order
         $prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($transaction->getStatus());

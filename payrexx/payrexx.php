@@ -274,21 +274,9 @@ class Payrexx extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        $actionText = $this->l('Payrexx payment method title');
-        $action = $this->context->link->getModuleLink(
-            $this->name,
-            'payrexx'
-        );
-        $paymentOption = new PaymentOption();
-        $paymentOption->setCallToActionText($actionText);
-        $paymentOption->setAction($action);
-        $paymentOption->setAdditionalInformation(
-            $this->l('Payrexx payment method description')
-        );
-        $paymentMethods[] = $paymentOption;
-
         // Additional payment methods
         $this->loadTranslationsInUi();
+        $action = $this->context->link->getModuleLink($this->name, 'payrexx');
         foreach ($this->getPaymentMethodsList(true) as $paymentMethod) {
             if (!$this->allowedPaymentMethodToPay($paymentMethod)) {
                 continue;
@@ -296,12 +284,17 @@ class Payrexx extends PaymentModule
 
             $configPaymentMethods = PayrexxConfig::getPaymentMethods();
             $title = $configPaymentMethods[$paymentMethod['pm']];
-            $img = $this->_path . 'views/img/cardicons/card_' . str_replace('-', '_', $paymentMethod['pm']) . '.svg';
+            $imageSrc = $this->_path . 'views/img/cardicons/card_' .
+                str_replace('-', '_', $paymentMethod['pm']) . '.svg';
 
+            $additionalInfo = '<img src=' . $imageSrc . ' width=100>';
+            if ($paymentMethod['pm'] == 'payrexx') {
+                $additionalInfo .= ' ' .$this->l('Payrexx payment method description');
+            }
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
             $paymentOption->setCallToActionText($this->l($title));
-            $paymentOption->setAdditionalInformation('<img src=' . $img . ' width=100>');
+            $paymentOption->setAdditionalInformation($additionalInfo);
             $paymentOption->setInputs(
                 [
                     'pm' => [
@@ -353,6 +346,7 @@ class Payrexx extends PaymentModule
      */
     public function loadTranslationsInUi()
     {
+        $this->l('Payrexx payment method title');
         $this->l('Masterpass');
         $this->l('Mastercard');
         $this->l('Visa');

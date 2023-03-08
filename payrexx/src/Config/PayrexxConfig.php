@@ -48,6 +48,7 @@ class PayrexxConfig
     public static function getPaymentMethods(): array
     {
         return [
+            'payrexx' => 'Payrexx payment method title',
             'masterpass' => 'Masterpass',
             'mastercard' => 'Mastercard',
             'visa' => 'Visa',
@@ -87,18 +88,15 @@ class PayrexxConfig
     }
 
     /**
-     * @param string $pmIdentifier payment method key
+     * @param string $pm payment method key
      * @return string
      */
-    public static function getPaymentMethodNameByIdentifier(string $pmIdentifier): string
+    public static function getPaymentMethodNameByPm(string $pm): string
     {
         $paymentMethods = static::getPaymentMethods();
-        if (empty($pmIdentifier) ||
-            $pmIdentifier === 'payrexx' ||
-            !isset($paymentMethods[$pmIdentifier])
-        ) {
+        if (empty($pm) || $pm === 'payrexx' || !isset($paymentMethods[$pm])) {
             return 'Payrexx';
         }
-        return $paymentMethods[$pmIdentifier] . ' by payrexx';
+        return $paymentMethods[$pm] . ' by payrexx';
     }
 }

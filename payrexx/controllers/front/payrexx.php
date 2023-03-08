@@ -46,7 +46,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             if ($gatewayId = $payrexxDbService->getCartGatewayId($cart->id)) {
                 $payrexxApiService->deletePayrexxGateway($gatewayId);
             }
-            $pm = !empty(Tools::getValue('payrexxPaymentMethod')) ? [Tools::getValue('payrexxPaymentMethod')] : [];
+            $paymentMethod = Tools::getValue('payrexxPaymentMethod');
+            $pm = ($paymentMethod != 'payrexx') ? [$paymentMethod] : [];
             $gateway = $payrexxApiService->createPayrexxGateway(
                 $purpose,
                 $total,
@@ -66,7 +67,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $payrexxDbService->insertGatewayInfo(
                 $cart->id,
                 $gateway->getId(),
-                Tools::getValue('payrexxPaymentMethod')
+                $paymentMethod
             );
             $lang = Language::getIsoById($context->cookie->id_lang);
 

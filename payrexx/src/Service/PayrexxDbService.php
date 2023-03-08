@@ -23,12 +23,11 @@ class PayrexxDbService
         if (empty($idCart) || empty($idGateway)) {
             return false;
         }
-        $paymentMethod = empty($paymentMethod) ? 'payrexx' : $paymentMethod;
-
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
             INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`, `pm`)
             VALUES (' . (int) $idCart . ',' . (int) $idGateway . ',\'' . $paymentMethod . '\')'
-            . 'ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway
+            . ' ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway 
+            .', pm = \'' . $paymentMethod . '\''
         );
     }
 
