@@ -11,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
-use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class Payrexx extends PaymentModule
@@ -69,7 +69,7 @@ class Payrexx extends PaymentModule
      */
     public function uninstall()
     {
-        $config = ConfigurationUtil::getConfigKeys();
+        $config = PayrexxConfig::getConfigKeys();
         foreach ($config as $var) {
             Configuration::deleteByName($var);
         }
@@ -100,7 +100,7 @@ class Payrexx extends PaymentModule
     {
         $this->postProcess();
 
-        foreach (ConfigurationUtil::getPlatforms() as $url => $platformName) {
+        foreach (PayrexxConfig::getPlatforms() as $url => $platformName) {
             $platforms[] = [
                 'url' => $url,
                 'name' => $platformName,
@@ -153,7 +153,7 @@ class Payrexx extends PaymentModule
                 'class' => 'btn btn-default pull-right',
             ],
         ];
-        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
+        foreach (PayrexxConfig::getConfigKeys() as $configKey) {
             $fieldsValue[strtolower($configKey)] = Configuration::get($configKey);
         }
         $helper = new HelperForm();
@@ -258,7 +258,7 @@ class Payrexx extends PaymentModule
             $this->context->controller->errors[] = 'Please enter valid credentials! Try again.';
             return false;
         }
-        foreach (ConfigurationUtil::getConfigKeys() as $configKey) {
+        foreach (PayrexxConfig::getConfigKeys() as $configKey) {
             $configValue = Tools::getValue(strtolower($configKey));
             Configuration::updateValue($configKey, $configValue);
         }
@@ -294,7 +294,7 @@ class Payrexx extends PaymentModule
                 continue;
             }
 
-            $configPaymentMethods = ConfigurationUtil::getPaymentMethods();
+            $configPaymentMethods = PayrexxConfig::getPaymentMethods();
             $title = $configPaymentMethods[$paymentMethod['pm']];
             $img = $this->_path . 'views/img/cardicons/card_' . str_replace('-', '_', $paymentMethod['pm']) . '.svg';
 

@@ -6,9 +6,9 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-require_once _PS_MODULE_DIR_ . 'payrexx/src/Util/ConfigurationUtil.php';
+require_once _PS_MODULE_DIR_ . 'payrexx/src/Config/PayrexxConfig.php';
 
-use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
     id_cart INT(11) NOT NULL UNIQUE,
@@ -44,7 +44,7 @@ foreach ($results as $result) {
     $existingPm[] = $result['pm'];
 }
 $paymentMethods = array_diff(
-    array_keys(ConfigurationUtil::getPaymentMethods()), $existingPm
+    array_keys(PayrexxConfig::getPaymentMethods()), $existingPm
 );
 // add payment methods
 foreach ($paymentMethods as $paymentMethod) {

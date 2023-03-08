@@ -8,7 +8,7 @@
  */
 include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethods.php';
 
-use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -42,7 +42,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
         foreach (['country', 'currency', 'customer_group'] as $fieldName) {
             $this->fields_value[$fieldName . '[]'] = unserialize($paymentMethod->$fieldName);
         }
-        $configPaymentMethods = ConfigurationUtil::getPaymentMethods();
+        $configPaymentMethods = PayrexxConfig::getPaymentMethods();
         $pageTitle = $this->l($configPaymentMethods[$paymentMethod->pm]);
         $this->fields_form = [
             'legend' => [

@@ -6,7 +6,7 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-use Payrexx\PayrexxPaymentGateway\Util\ConfigurationUtil;
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
@@ -52,7 +52,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         }
 
         $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
-        $paymentMethod = ConfigurationUtil::getPaymentMethodNameByIdentifier($pm);
+        $paymentMethod = PayrexxConfig::getPaymentMethodNameByIdentifier($pm);
 
         // Create order
         $prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($transaction->getStatus());
