@@ -289,7 +289,7 @@ class Payrexx extends PaymentModule
 
             $additionalInfo = '<img src=' . $imageSrc . ' width=100>';
             if ($paymentMethod['pm'] == 'payrexx') {
-                $additionalInfo .= ' ' .$this->l('Payrexx payment method description');
+                $additionalInfo .= ' ' . $this->l('Payrexx payment method description');
             }
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
