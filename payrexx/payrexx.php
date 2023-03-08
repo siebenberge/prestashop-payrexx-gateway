@@ -10,8 +10,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class Payrexx extends PaymentModule
