@@ -60,7 +60,10 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             $cartId,
             $prestaStatus,
             $transaction->getAmount(),
-            $paymentMethod
+            $paymentMethod,
+            [
+                'transaction_id' => $transaction->getId(),
+            ]
         );
 
         // Redirect to confirmation page if order creation was successful

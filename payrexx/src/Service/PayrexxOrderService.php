@@ -18,8 +18,13 @@ use OrderHistory;
 
 class PayrexxOrderService
 {
-    public function createOrder($cartId, $prestaStatus, $amount, $paymentMethod)
-    {
+    public function createOrder(
+        $cartId,
+        $prestaStatus,
+        $amount,
+        $paymentMethod,
+        array $extraVars = []
+    ) {
         $payrexxModule = Module::getInstanceByName('payrexx');
         $cart = new Cart($cartId);
         $customer = new Customer($cart->id_customer);
@@ -31,7 +36,7 @@ class PayrexxOrderService
             (float) $amount / 100,
             $paymentMethod,
             null,
-            [],
+            $extraVars,
             (int) $cart->id_currency,
             false,
             $customer->secure_key

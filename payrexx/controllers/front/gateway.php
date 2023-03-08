@@ -40,7 +40,10 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
                 $cartId,
                 $prestaStatus,
                 $transaction['amount'],
-                $paymentMethod
+                $paymentMethod,
+                [
+                    'transaction_id' => $transaction['id'],
+                ]
             );
             exit;
         }
@@ -48,7 +51,6 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         // Update status if current status is not final
         if ($order && $order->current_state !== 2) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
-            $order->addOrderPayment($transaction['amount'], $paymentMethod, $transaction['id']);
             exit;
         }
         exit;
