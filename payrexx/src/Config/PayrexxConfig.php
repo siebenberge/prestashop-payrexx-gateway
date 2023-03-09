@@ -97,6 +97,6 @@ class PayrexxConfig
         if (empty($pm) || $pm === 'payrexx' || !isset($paymentMethods[$pm])) {
             return 'Payrexx';
         }
-        return $paymentMethods[$pm] . ' by payrexx';
+        return $paymentMethods[$pm] . ' by Payrexx';
     }
 }
