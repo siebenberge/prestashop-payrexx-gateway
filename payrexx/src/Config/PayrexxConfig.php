@@ -93,7 +93,7 @@ class PayrexxConfig
      */
     public static function getPaymentMethodNameByPm(string $pm): string
     {
-        $paymentMethods = static::getPaymentMethods();
+        $paymentMethods = self::getPaymentMethods();
         if (empty($pm) || $pm === 'payrexx' || !isset($paymentMethods[$pm])) {
             return 'Payrexx';
         }
