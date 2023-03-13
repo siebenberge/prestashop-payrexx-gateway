@@ -6,7 +6,7 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-class PayrexxPaymentMethods extends ObjectModel
+class PayrexxPaymentMethod extends ObjectModel
 {
     public $id;
 

@@ -6,7 +6,7 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethods.php';
+include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethod.php';
 
 use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
@@ -22,7 +22,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
 
         // Set variables
         $this->table = 'payrexx_payment_methods';
-        $this->className = 'PayrexxPaymentMethods';
+        $this->className = 'PayrexxPaymentMethod';
         // Enable bootstrap
         $this->bootstrap = true;
         $this->_orderBy = 'id';
