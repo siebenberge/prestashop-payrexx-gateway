@@ -49,7 +49,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         // Update status if current status is not final
-        if ($order && $order->current_state !== 2) {
+        if ($order && (int) $order->current_state !== 2) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
             exit;
         }

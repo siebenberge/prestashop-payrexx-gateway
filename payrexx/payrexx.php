@@ -235,8 +235,8 @@ class Payrexx extends PaymentModule
         $sql->from('payrexx_payment_methods');
         if ($filterActive) {
             $sql->where('active = 1');
+            $sql->orderBy('position');
         }
-        $sql->orderBy('position');
         return Db::getInstance()->ExecuteS($sql);
     }
 
