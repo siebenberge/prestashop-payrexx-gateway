@@ -87,7 +87,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                     [
                         'payrexxError' => 'config',
                     ],
-                    true,
+                    true
                 )
             );
         }

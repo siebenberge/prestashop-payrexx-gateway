@@ -132,7 +132,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                 [
                     $this->context->cookie->__get('redirect_errors'),
                 ],
-                $this->errors,
+                $this->errors
             );
             // delete old messages
             $this->context->cookie->__unset('redirect_errors');

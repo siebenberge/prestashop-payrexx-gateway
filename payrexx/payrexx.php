@@ -302,7 +302,7 @@ class Payrexx extends PaymentModule
                         'type' => 'hidden',
                         'value' => $paymentMethod['pm'],
                     ],
-                ],
+                ]
             );
             $paymentMethods[] = $paymentOption;
         }
