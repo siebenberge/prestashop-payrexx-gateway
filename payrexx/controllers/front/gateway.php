@@ -4,16 +4,19 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2019 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
+use Payrexx\Models\Response\Transaction;
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
     public function initContent()
     {
         $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
+        $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
 
         $transaction = Tools::getValue('transaction');
         $cartId = $transaction['invoice']['referenceId'];
@@ -21,25 +24,36 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $order = Order::getByCartId($cartId);
 
         if (!$this->validRequest($transaction, $cartId, $requestStatus)) {
-            die;
+            exit;
         }
 
         if (!$prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($requestStatus)) {
-            die;
+            exit;
         }
 
+        $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
+        $paymentMethod = PayrexxConfig::getPaymentMethodNameByPm($pm);
+
         // Create order if transaction successful
-        if (!$order && in_array($requestStatus, [\Payrexx\Models\Response\Transaction::CONFIRMED, \Payrexx\Models\Response\Transaction::WAITING])) {
-            $payrexxOrderService->createOrder($cartId, $prestaStatus, $transaction['amount']);
-            die;
+        if (!$order && in_array($requestStatus, [Transaction::CONFIRMED, Transaction::WAITING])) {
+            $payrexxOrderService->createOrder(
+                $cartId,
+                $prestaStatus,
+                $transaction['amount'],
+                $paymentMethod,
+                [
+                    'transaction_id' => $transaction['id'],
+                ]
+            );
+            exit;
         }
 
         // Update status if current status is not final
-        if ($order && $order->current_state !== 2) {
+        if ($order && (int) $order->current_state !== 2) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
-            die;
+            exit;
         }
-        die;
+        exit;
     }
 
     private function validRequest($transaction, $cartId, $requestStatus): bool
@@ -50,7 +64,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         }
 
         $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
-        $gateway = $payrexxApiService->getPayrexxGateway((int)$transaction['invoice']['paymentRequestId']);
+        $gateway = $payrexxApiService->getPayrexxGateway((int) $transaction['invoice']['paymentRequestId']);
 
         // Validate request by gateway ID
         if (!$gateway) {
@@ -61,7 +75,7 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
 
         $payrexxAmount = $transactionObj->getAmount();
 
-        if (empty($payrexxAmount) || $payrexxAmount !== (int)$transaction['amount']) {
+        if (empty($payrexxAmount) || $payrexxAmount !== (int) $transaction['amount']) {
             return false;
         }
 

@@ -1,13 +1,12 @@
 <?php
 /**
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
+ * Payrexx Validation Module FrontController
  *
- * @author Payrexx <support@payrexx.com>
- * @copyright  2017 Payrexx
- * @license MIT License
+ * @author    Payrexx <support@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
@@ -17,8 +16,8 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     public function __construct()
     {
-        if (isset($_GET['payrexxError'])) {
-            $this->handleError($_GET['payrexxError']);
+        if (Tools::getIsset('payrexxError')) {
+            $this->handleError(Tools::getValue('payrexxError'));
         }
 
         parent::__construct();
@@ -52,9 +51,20 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             return;
         }
 
+        $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
+        $paymentMethod = PayrexxConfig::getPaymentMethodNameByPm($pm);
+
         // Create order
         $prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($transaction->getStatus());
-        $payrexxOrderService->createOrder($cartId, $prestaStatus, $transaction->getAmount());
+        $payrexxOrderService->createOrder(
+            $cartId,
+            $prestaStatus,
+            $transaction->getAmount(),
+            $paymentMethod,
+            [
+                'transaction_id' => $transaction->getId(),
+            ]
+        );
 
         // Redirect to confirmation page if order creation was successful
         if ($order = Order::getByCartId($cartId)) {
@@ -71,7 +81,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     private function handleError($payrexxError)
     {
-        switch($payrexxError) {
+        switch ($payrexxError) {
             case self::ERROR_CONFIG:
                 $errMsg = 'The connection to the payment provider failed. Please contact the Shop owner';
                 break;
@@ -84,7 +94,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
                 break;
         }
 
-        $this->errors[] = Tools::displayError($errMsg);
+        $this->errors[] = $errMsg;
         $this->redirectWithNotifications('index.php?controller=order&step=1');
     }
 }

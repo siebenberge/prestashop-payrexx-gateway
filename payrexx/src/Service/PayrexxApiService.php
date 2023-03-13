@@ -4,17 +4,16 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2019 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
  */
-
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
 use Configuration;
+use Payrexx\Models\Request\SignatureCheck;
 use Payrexx\Models\Response\Gateway;
 use Payrexx\Models\Response\Transaction;
-use Payrexx\Models\Request\SignatureCheck;
 
 class PayrexxApiService
 {
@@ -30,8 +29,8 @@ class PayrexxApiService
     }
 
     /**
-     *
      * @param int $gatewayId
+     *
      * @return \Payrexx\Models\Response\Gateway|null
      */
     public function getPayrexxGateway($gatewayId): ?Gateway
@@ -51,7 +50,7 @@ class PayrexxApiService
         return null;
     }
 
-    public function getTransactionByGateway($payrexxGateway): ?\Payrexx\Models\Response\Transaction
+    public function getTransactionByGateway($payrexxGateway): ?Transaction
     {
         if (!in_array($payrexxGateway->getStatus(), [Transaction::CONFIRMED, Transaction::WAITING])) {
             return null;
@@ -71,7 +70,7 @@ class PayrexxApiService
 
     /**
      * @param int $transactionId
-     * @return \Payrexx\Models\Request\Transaction|NULL
+     * @return \Payrexx\Models\Response\Transaction|null
      */
     public function getPayrexxTransaction($transactionId): ?Transaction
     {
@@ -90,8 +89,17 @@ class PayrexxApiService
         }
     }
 
-    public function createPayrexxGateway(string $purpose, float $total, string $currency, string $successRedirectUrl, string $cancelRedirectUrl, string $failedRedirectUrl, $cart, $customer, $address, string $country): ?Gateway
-    {
+    public function createPayrexxGateway(
+        string $purpose,
+        float $total,
+        string $currency,
+        array $redirectUrls,
+        $cart,
+        $customer,
+        $address,
+        string $country,
+        array $pm
+    ): ?Gateway {
         $basket = [];
         $basketAmount = 0;
         foreach ($cart->getProducts() as $product) {
@@ -129,7 +137,7 @@ class PayrexxApiService
         $gateway = new \Payrexx\Models\Request\Gateway();
 
         // Fallback for basket feature
-        if ((int)$basketAmount === (int)($total * 100)) {
+        if ((int) $basketAmount === (int) ($total * 100)) {
             $gateway->setBasket($basket);
         } else {
             $gateway->setPurpose($purpose);
@@ -138,10 +146,11 @@ class PayrexxApiService
         $gateway->setAmount($total * 100);
         $gateway->setVatRate($cart->getAverageProductsTaxRate() * 100);
         $gateway->setCurrency($currency);
-        $gateway->setSuccessRedirectUrl($successRedirectUrl);
-        $gateway->setCancelRedirectUrl($cancelRedirectUrl);
-        $gateway->setFailedRedirectUrl($failedRedirectUrl);
+        $gateway->setSuccessRedirectUrl($redirectUrls['success']);
+        $gateway->setCancelRedirectUrl($redirectUrls['cancel']);
+        $gateway->setFailedRedirectUrl($redirectUrls['failed']);
         $gateway->setPsp([]);
+        $gateway->setPm($pm);
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
 
