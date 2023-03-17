@@ -16,8 +16,6 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway` (
     PRIMARY KEY (`id_cart`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
-$sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'payrexx_gateway` ADD COLUMN IF NOT EXISTS pm varchar(100) NOT NULL DEFAULT \'payrexx\'';
-
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods` (
     `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `active` tinyint DEFAULT NULL,
@@ -30,6 +28,18 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
+        return false;
+    }
+}
+
+// Alter the table
+$listFields = Db::getInstance()->executeS(
+    'SHOW FIELDS FROM `' . _DB_PREFIX_ . 'payrexx_gateway`'
+);
+if (is_array($listFields) && !in_array('pm', array_column($listFields, 'Field'))) {
+    $alterQuery = 'ALTER TABLE `' . _DB_PREFIX_ . 'payrexx_gateway`
+        ADD `pm` varchar(100) NOT NULL DEFAULT \'payrexx\'';
+    if (Db::getInstance()->execute($alterQuery) == false) {
         return false;
     }
 }
