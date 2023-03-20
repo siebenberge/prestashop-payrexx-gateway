@@ -6,7 +6,6 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
@@ -25,12 +24,9 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     public function initContent()
     {
-        $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
-        $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
         $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
 
         $gatewayId = $this->context->cookie->paymentId;
-        $gateway = $payrexxApiService->getPayrexxGateway($gatewayId);
         $cartId = $payrexxDbService->getGatewayCartId($gatewayId);
 
         // Redirect to success page if successful order already exists
@@ -44,39 +40,7 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             );
         }
 
-        // handle error if no successful transaction exists
-        $transaction = $payrexxApiService->getTransactionByGateway($gateway);
-        if (!$transaction || !in_array($transaction->getStatus(), [\Payrexx\Models\Response\Transaction::CONFIRMED, \Payrexx\Models\Response\Transaction::WAITING])) {
-            $this->handleError(self::ERROR_FAIL);
-            return;
-        }
-
-        $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
-        $paymentMethod = PayrexxConfig::getPaymentMethodNameByPm($pm);
-
-        // Create order
-        $prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($transaction->getStatus());
-        $payrexxOrderService->createOrder(
-            $cartId,
-            $prestaStatus,
-            $transaction->getAmount(),
-            $paymentMethod,
-            [
-                'transaction_id' => $transaction->getId(),
-            ]
-        );
-
-        // Redirect to confirmation page if order creation was successful
-        if ($order = Order::getByCartId($cartId)) {
-            Tools::redirect(
-                'index.php?controller=order-confirmation&id_cart=' . $cartId .
-                '&id_module=' . $this->module->id .
-                '&id_order=' . $this->module->currentOrder .
-                '&key=' . $order->secure_key
-            );
-        }
-
-        $this->handleError(self::ERROR_FAIL);
+        $this->handleError(self::ERROR_CONFIG);
     }
 
     private function handleError($payrexxError)
