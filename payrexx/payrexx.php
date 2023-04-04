@@ -287,14 +287,9 @@ class Payrexx extends PaymentModule
             $imageSrc = $this->_path . 'views/img/cardicons/card_' .
                 str_replace('-', '_', $paymentMethod['pm']) . '.svg';
 
-            $additionalInfo = '<img src=' . $imageSrc . ' width=100>';
-            if ($paymentMethod['pm'] == 'payrexx') {
-                $additionalInfo .= ' ' . $this->l('Payrexx payment method description');
-            }
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
             $paymentOption->setCallToActionText($this->l($title));
-            $paymentOption->setAdditionalInformation($additionalInfo);
             $paymentOption->setInputs(
                 [
                     'pm' => [
@@ -304,6 +299,12 @@ class Payrexx extends PaymentModule
                     ],
                 ]
             );
+            $paymentOption->setLogo($imageSrc);
+            if ($paymentMethod['pm'] == 'payrexx') {
+                $paymentOption->setAdditionalInformation(
+                    $this->l('Payrexx payment method description')
+                );
+            }
             $paymentMethods[] = $paymentOption;
         }
         return $paymentMethods;
