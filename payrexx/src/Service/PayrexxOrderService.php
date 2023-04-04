@@ -18,6 +18,27 @@ use OrderHistory;
 
 class PayrexxOrderService
 {
+
+    // ID 8
+    const PS_STATUS_ERROR = 'PS_OS_ERROR';
+
+    // ID 7
+    const PS_STATUS_REFUND = 'PS_OS_REFUND';
+
+    // ID 2
+    const PS_STATUS_PAYMENT = 'PS_OS_PAYMENT';
+
+    // ID 10
+    const PS_STATUS_BANKWIRE = 'PS_OS_BANKWIRE';
+
+    /**
+     * @param $cartId
+     * @param $prestaStatus
+     * @param $amount
+     * @param $paymentMethod
+     * @param array $extraVars
+     * @return void
+     */
     public function createOrder(
         $cartId,
         $prestaStatus,
@@ -45,6 +66,10 @@ class PayrexxOrderService
         $context->cart = $cart;
     }
 
+    /**
+     * @param $transactionStatus
+     * @return string|null
+     */
     public function getPrestaStatusByPayrexxStatus($transactionStatus)
     {
         $prestaStatus = null;
@@ -53,23 +78,47 @@ class PayrexxOrderService
             case \Payrexx\Models\Response\Transaction::DECLINED:
             case \Payrexx\Models\Response\Transaction::ERROR:
             case \Payrexx\Models\Response\Transaction::EXPIRED:
-                $prestaStatus = 'PS_OS_ERROR';
+                $prestaStatus = self::PS_STATUS_ERROR;
                 break;
             case \Payrexx\Models\Response\Transaction::REFUNDED:
             case \Payrexx\Models\Response\Transaction::PARTIALLY_REFUNDED:
-                $prestaStatus = 'PS_OS_REFUND';
+                $prestaStatus = self::PS_STATUS_REFUND;
                 break;
             case \Payrexx\Models\Response\Transaction::CONFIRMED:
-                $prestaStatus = 'PS_OS_PAYMENT';
+                $prestaStatus = self::PS_STATUS_PAYMENT;
                 break;
             case \Payrexx\Models\Response\Transaction::WAITING:
-                $prestaStatus = 'PS_OS_BANKWIRE';
+                $prestaStatus = self::PS_STATUS_BANKWIRE;
                 break;
         }
 
         return $prestaStatus;
     }
 
+    /**
+     * @param $newStatus
+     * @param $oldStatusId
+     * @return bool|void
+     */
+    public function transitionAllowed($newStatus, $oldStatusId)
+    {
+        switch ($newStatus) {
+            case self::PS_STATUS_ERROR:
+                return !in_array($oldStatusId, [(int)Configuration::get(self::PS_STATUS_PAYMENT), (int)Configuration::get(self::PS_STATUS_REFUND)]);
+            case self::PS_STATUS_REFUND:
+                return in_array($oldStatusId, [(int)Configuration::get(self::PS_STATUS_PAYMENT), (int)Configuration::get(self::PS_STATUS_REFUND)]);
+            case self::PS_STATUS_PAYMENT:
+                return $oldStatusId !== (int)Configuration::get(self::PS_STATUS_PAYMENT);
+            case self::PS_STATUS_BANKWIRE:
+                return $oldStatusId !== (int)Configuration::get(self::PS_STATUS_BANKWIRE);
+        }
+    }
+
+    /**
+     * @param $prestaStatus
+     * @param $order
+     * @return void
+     */
     public function updateOrderStatus($prestaStatus, $order)
     {
         $orderHistory = new OrderHistory();
