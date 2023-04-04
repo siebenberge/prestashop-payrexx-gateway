@@ -48,10 +48,13 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             exit;
         }
 
-        // Update status if current status is not final
-        if ($order && (int) $order->current_state !== 2) {
-            $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
+        if ($order->module !== $this->module->name) {
             exit;
+        }
+
+        // Update status if transition allowed
+        if ($order && $payrexxOrderService->transitionAllowed($prestaStatus, $order->current_state)) {
+            $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
         }
         exit;
     }

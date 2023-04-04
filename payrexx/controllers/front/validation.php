@@ -15,15 +15,16 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
 
     public function __construct()
     {
-        if (Tools::getIsset('payrexxError')) {
-            $this->handleError(Tools::getValue('payrexxError'));
-        }
-
         parent::__construct();
     }
 
     public function initContent()
     {
+        if (Tools::getIsset('payrexxError')) {
+            $this->handleError(Tools::getValue('payrexxError'));
+            exit;
+        }
+
         $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
 
         $gatewayId = $this->context->cookie->paymentId;
@@ -43,6 +44,10 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
         $this->handleError(self::ERROR_CONFIG);
     }
 
+    /**
+     * @param $payrexxError
+     * @return void
+     */
     private function handleError($payrexxError)
     {
         switch ($payrexxError) {
