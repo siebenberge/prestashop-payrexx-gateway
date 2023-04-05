@@ -10,7 +10,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_4_2($module)
+function upgrade_module_1_4_4($module)
 {
     return $module->registerHook('actionFrontControllerSetMedia');
 }
