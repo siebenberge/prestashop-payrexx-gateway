@@ -24,7 +24,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.4.1';
+        $this->version = '1.4.4';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = ['min' => '1.7'];
@@ -46,7 +46,8 @@ class Payrexx extends PaymentModule
         // Install default
         if (!parent::install() ||
             !$this->installDb() ||
-            !$this->registerHook('paymentOptions')
+            !$this->registerHook('paymentOptions') ||
+            !$this->registerHook('actionFrontControllerSetMedia')
         ) {
             return false;
         }
@@ -266,6 +267,21 @@ class Payrexx extends PaymentModule
     }
 
     /**
+     * Add asset for Shop Front Office
+     *
+     * @see https://devdocs.prestashop.com/1.7/themes/getting-started/asset-management/#without-a-front-controller-module
+     *
+     * @param array $params
+     */
+    public function hookActionFrontControllerSetMedia(array $params)
+    {
+        $this->context->controller->registerStylesheet(
+            'payrexx-payment-method-icon',
+            '/modules/' . $this->name . '/views/css/custom.css'
+        );
+    }
+
+    /**
      * Return payment options
      *
      * @param array $params parameters
@@ -289,6 +305,7 @@ class Payrexx extends PaymentModule
 
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
+            $paymentOption->setModuleName($this->name);
             $paymentOption->setCallToActionText($this->l($title));
             $paymentOption->setInputs(
                 [
@@ -301,6 +318,7 @@ class Payrexx extends PaymentModule
             );
             $paymentOption->setLogo($imageSrc);
             if ($paymentMethod['pm'] == 'payrexx') {
+                $paymentOption->setLogo('');
                 $paymentOption->setAdditionalInformation(
                     $this->l('Payrexx payment method description')
                 );
