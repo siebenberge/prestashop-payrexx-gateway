@@ -31,6 +31,7 @@ $(document).on('ready', function() {
                     .attr('id').match(/\d+/);
                 if ($containerId > 0) {
                     jQuery('#payment-option-' + $containerId + '-container').remove();
+                    console.warn("Payrexx Google Pay is not supported on this device/browser");
                 }
             }
         }).catch(function(err) {
