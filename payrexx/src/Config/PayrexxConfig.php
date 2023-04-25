@@ -84,6 +84,8 @@ class PayrexxConfig
             'google-pay' => 'Google Pay',
             'wechat-pay' => 'WeChat Pay',
             'alipay' => 'Alipay',
+            'centi' => 'Centi',
+            'heidipay' => 'Heidipay',
         ];
     }
 
