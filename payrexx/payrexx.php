@@ -24,7 +24,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.4.4';
+        $this->version = '1.4.5';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = ['min' => '1.7'];
@@ -279,6 +279,42 @@ class Payrexx extends PaymentModule
             'payrexx-payment-method-icon',
             '/modules/' . $this->name . '/views/css/custom.css'
         );
+        $paymentMeans = array_column($this->getPaymentMethodsList(true), 'pm');
+        if (!in_array('apple-pay', $paymentMeans) && !in_array('google-pay', $paymentMeans)) {
+            return;
+        }
+
+        // Apple pay device check related js
+        if (in_array('apple-pay', $paymentMeans)) {
+            $this->context->controller->registerJavascript(
+                'payrexx-payment-method-apple-pay',
+                '/modules/' . $this->name . '/views/js/applepay.js',
+                [
+                  'priority' => 996,
+                  'position' => 'bottom',
+                ]
+            );
+        }
+        // Google pay device check related js
+        if (in_array('google-pay', $paymentMeans)) {
+            $this->context->controller->registerJavascript(
+                'payrexx-payment-method-google-pay-lib',
+                'https://pay.google.com/gp/p/js/pay.js',
+                [
+                  'priority' => 996,
+                  'server' => 'remote',
+                  'position' => 'bottom',
+                ]
+            );
+            $this->context->controller->registerJavascript(
+                'payrexx-payment-method-google-pay',
+                '/modules/' . $this->name . '/views/js/googlepay.js',
+                [
+                  'priority' => 997,
+                  'position' => 'bottom',
+                ]
+            );
+        }
     }
 
     /**
