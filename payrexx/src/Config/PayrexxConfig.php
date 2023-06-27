@@ -86,6 +86,7 @@ class PayrexxConfig
             'alipay' => 'Alipay',
             'centi' => 'Centi',
             'heidipay' => 'Heidipay',
+            'bob-invoice' => 'Bob Invoice',
         ];
     }
 
