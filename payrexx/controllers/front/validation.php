@@ -6,7 +6,6 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
-
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
     const ERROR_CONFIG = 'config';

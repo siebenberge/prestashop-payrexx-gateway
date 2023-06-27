@@ -18,7 +18,6 @@ use OrderHistory;
 
 class PayrexxOrderService
 {
-
     // ID 8
     const PS_STATUS_ERROR = 'PS_OS_ERROR';
 
@@ -104,13 +103,13 @@ class PayrexxOrderService
     {
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:
-                return !in_array($oldStatusId, [(int)Configuration::get(self::PS_STATUS_PAYMENT), (int)Configuration::get(self::PS_STATUS_REFUND)]);
+                return !in_array($oldStatusId, [(int) Configuration::get(self::PS_STATUS_PAYMENT), (int) Configuration::get(self::PS_STATUS_REFUND)]);
             case self::PS_STATUS_REFUND:
-                return in_array($oldStatusId, [(int)Configuration::get(self::PS_STATUS_PAYMENT), (int)Configuration::get(self::PS_STATUS_REFUND)]);
+                return in_array($oldStatusId, [(int) Configuration::get(self::PS_STATUS_PAYMENT), (int) Configuration::get(self::PS_STATUS_REFUND)]);
             case self::PS_STATUS_PAYMENT:
-                return $oldStatusId !== (int)Configuration::get(self::PS_STATUS_PAYMENT);
+                return $oldStatusId !== (int) Configuration::get(self::PS_STATUS_PAYMENT);
             case self::PS_STATUS_BANKWIRE:
-                return $oldStatusId !== (int)Configuration::get(self::PS_STATUS_BANKWIRE);
+                return $oldStatusId !== (int) Configuration::get(self::PS_STATUS_BANKWIRE);
         }
     }
 

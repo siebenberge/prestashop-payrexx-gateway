@@ -1,3 +1,10 @@
+/**
+ * Payrexx Payment Gateway.
+ *
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright 2023 Payrexx
+ * @license   MIT License
+ */
 $(document).on('ready', function() {
     try {
         const baseRequest = {
