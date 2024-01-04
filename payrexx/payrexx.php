@@ -10,6 +10,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+if (!class_exists('\Payrexx\PayrexxPaymentGateway')) {
+    $autoloadLocation = __DIR__ . '/vendor/autoload.php';
+    if (file_exists($autoloadLocation)) {
+        require_once $autoloadLocation;
+    }
+}
+
 use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
 use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
