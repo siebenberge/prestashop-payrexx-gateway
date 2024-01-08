@@ -6,6 +6,9 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 require_once _PS_MODULE_DIR_ . 'payrexx/src/Config/PayrexxConfig.php';
 
 use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
@@ -61,9 +64,9 @@ foreach ($paymentMethods as $paymentMethod) {
     $insertData = [
         'active' => $paymentMethod == 'payrexx' ? 1 : 0,
         'pm' => $paymentMethod,
-        'country' => serialize([]),
-        'currency' => serialize([]),
-        'customer_group' => serialize([]),
+        'country' => json_encode([]),
+        'currency' => json_encode([]),
+        'customer_group' => json_encode([]),
         'position' => 0,
     ];
     if (Db::getInstance()->insert('payrexx_payment_methods', $insertData) == false) {

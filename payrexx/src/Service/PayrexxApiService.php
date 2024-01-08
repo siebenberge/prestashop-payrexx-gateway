@@ -8,12 +8,18 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+
 namespace Payrexx\PayrexxPaymentGateway\Service;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Configuration;
 use Payrexx\Models\Request\SignatureCheck;
 use Payrexx\Models\Response\Gateway;
 use Payrexx\Models\Response\Transaction;
+use Payrexx\PayrexxException;
 
 class PayrexxApiService
 {
@@ -45,7 +51,7 @@ class PayrexxApiService
 
         try {
             return $payrexx->getOne($gateway);
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
         }
         return null;
     }
@@ -84,7 +90,7 @@ class PayrexxApiService
 
         try {
             return $payrexx->getOne($transaction);
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
             return null;
         }
     }
@@ -172,7 +178,7 @@ class PayrexxApiService
 
         try {
             return $payrexx->create($gateway);
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
         }
         return null;
     }
@@ -186,7 +192,7 @@ class PayrexxApiService
 
         try {
             $payrexx->delete($gateway);
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
         }
     }
 
@@ -217,7 +223,7 @@ class PayrexxApiService
         try {
             $payrexx->getOne(new SignatureCheck());
             return true;
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
             return false;
         }
     }

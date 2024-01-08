@@ -3,7 +3,7 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 include_once _PS_MODULE_DIR_ . 'payrexx/src/Models/PayrexxPaymentMethod.php';
@@ -40,7 +40,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
 
         $paymentMethod = $this->loadObject(true);
         foreach (['country', 'currency', 'customer_group'] as $fieldName) {
-            $this->fields_value[$fieldName . '[]'] = unserialize($paymentMethod->$fieldName);
+            $this->fields_value[$fieldName . '[]'] = json_decode($paymentMethod->$fieldName, true);
         }
         $configPaymentMethods = PayrexxConfig::getPaymentMethods();
         $pageTitle = $this->l($configPaymentMethods[$paymentMethod->pm]);
@@ -89,7 +89,7 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
                     'desc' => 'Leave empty accepts payment for all currency',
                     'options' => [
                         'query' => Currency::getCurrencies(false, false),
-                        'id' => 'id',
+                        'id' => 'id_currency',
                         'name' => 'name',
                     ],
                 ],
@@ -126,8 +126,8 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
     public function display()
     {
         // show saved messages
-        if ($this->context->cookie->__isset('redirect_errors') &&
-            $this->context->cookie->__get('redirect_errors') != '') {
+        if ($this->context->cookie->__isset('redirect_errors')
+            && $this->context->cookie->__get('redirect_errors') != '') {
             $this->errors = array_merge(
                 [
                     $this->context->cookie->__get('redirect_errors'),
@@ -152,14 +152,14 @@ class AdminPayrexxPaymentMethodsController extends ModuleAdminController
 
         // Country
         $postCountry = !Tools::getIsset('country') ? [] : Tools::getValue('country');
-        $_POST['country'] = serialize($postCountry);
+        $_POST['country'] = json_encode($postCountry);
 
         // currency
         $postCurrency = !Tools::getIsset('currency') ? [] : Tools::getValue('currency');
-        $_POST['currency'] = serialize($postCurrency);
+        $_POST['currency'] = json_encode($postCurrency);
 
         $postCustomerGroup = !Tools::getIsset('customer_group') ? [] : Tools::getValue('customer_group');
-        $_POST['customer_group'] = serialize($postCustomerGroup);
+        $_POST['customer_group'] = json_encode($postCustomerGroup);
 
         parent::postProcess();
     }

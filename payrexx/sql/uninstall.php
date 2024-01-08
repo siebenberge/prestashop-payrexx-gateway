@@ -6,6 +6,9 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payrexx_gateway`;';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'payrexx_payment_methods`;';
 

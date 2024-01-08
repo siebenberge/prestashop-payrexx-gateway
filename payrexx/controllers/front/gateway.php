@@ -8,15 +8,26 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 use Payrexx\Models\Response\Transaction;
 use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxDbService;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxOrderService;
 
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
     public function initContent()
     {
-        $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
-        $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
+        if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
+            $payrexxOrderService = new PayrexxOrderService();
+            $payrexxDbService = new PayrexxDbService();
+        } else {
+            $payrexxOrderService = $this->get('payrexx.payrexxpaymentgateway.payrexxorderservice');
+            $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
+        }
 
         $transaction = Tools::getValue('transaction');
         $cartId = $transaction['invoice']['referenceId'];
@@ -66,7 +77,11 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
             return false;
         }
 
-        $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
+        if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
+            $payrexxApiService = new PayrexxApiService();
+        } else {
+            $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
+        }
         $gateway = $payrexxApiService->getPayrexxGateway((int) $transaction['invoice']['paymentRequestId']);
 
         // Validate request by gateway ID
