@@ -6,6 +6,10 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PayrexxPaymentMethod extends ObjectModel
 {
     public $id;

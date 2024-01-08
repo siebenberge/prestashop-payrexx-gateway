@@ -3,23 +3,23 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-if (!class_exists('\Payrexx\PayrexxPaymentGateway')) {
+use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
+if (!class_exists(PayrexxConfig::class)) {
     $autoloadLocation = __DIR__ . '/vendor/autoload.php';
     if (file_exists($autoloadLocation)) {
         require_once $autoloadLocation;
     }
 }
-
-use Payrexx\PayrexxPaymentGateway\Config\PayrexxConfig;
-use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class Payrexx extends PaymentModule
 {
@@ -31,7 +31,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.4.7';
+        $this->version = '1.4.8';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = ['min' => '1.7'];
@@ -51,10 +51,10 @@ class Payrexx extends PaymentModule
     public function install()
     {
         // Install default
-        if (!parent::install() ||
-            !$this->installDb() ||
-            !$this->registerHook('paymentOptions') ||
-            !$this->registerHook('actionFrontControllerSetMedia')
+        if (!parent::install()
+            || !$this->installDb()
+            || !$this->registerHook('paymentOptions')
+            || !$this->registerHook('actionFrontControllerSetMedia')
         ) {
             return false;
         }
@@ -336,6 +336,7 @@ class Payrexx extends PaymentModule
         // Additional payment methods
         $this->loadTranslationsInUi();
         $action = $this->context->link->getModuleLink($this->name, 'payrexx');
+        $paymentMethods = [];
         foreach ($this->getPaymentMethodsList(true) as $paymentMethod) {
             if (!$this->allowedPaymentMethodToPay($paymentMethod)) {
                 continue;
@@ -380,17 +381,17 @@ class Payrexx extends PaymentModule
      */
     public function allowedPaymentMethodToPay(array $paymentMethod): bool
     {
-        $allowedCountries = unserialize($paymentMethod['country']);
-        $allowedCurrencies = unserialize($paymentMethod['currency']);
-        $allowedCustomerGroups = unserialize($paymentMethod['customer_group']);
+        $allowedCountries = json_decode($paymentMethod['country'], true);
+        $allowedCurrencies = json_decode($paymentMethod['currency'], true);
+        $allowedCustomerGroups = json_decode($paymentMethod['customer_group'], true);
         if (!empty($allowedCountries) && !in_array($this->context->country->id, $allowedCountries)) {
             return false;
         }
         if (!empty($allowedCurrencies) && !in_array($this->context->currency->id, $allowedCurrencies)) {
             return false;
         }
-        if (!empty($allowedCustomerGroups) &&
-            empty(array_intersect(
+        if (!empty($allowedCustomerGroups)
+            && empty(array_intersect(
                 $this->context->customer->getGroups(),
                 $allowedCustomerGroups
             ))

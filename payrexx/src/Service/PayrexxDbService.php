@@ -6,9 +6,14 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
 use Db;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class PayrexxDbService
 {

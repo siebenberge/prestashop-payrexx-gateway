@@ -6,6 +6,7 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+
 namespace Payrexx\PayrexxPaymentGateway\Service;
 
 use Cart;
@@ -15,6 +16,10 @@ use Customer;
 use Db;
 use Module;
 use OrderHistory;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class PayrexxOrderService
 {

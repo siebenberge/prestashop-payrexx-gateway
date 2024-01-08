@@ -6,6 +6,11 @@
  * @copyright 2023 Payrexx
  * @license   MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxDbService;
+
 class PayrexxValidationModuleFrontController extends ModuleFrontController
 {
     const ERROR_CONFIG = 'config';
@@ -24,8 +29,11 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
             exit;
         }
 
-        $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
-
+        if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
+            $payrexxDbService = new PayrexxDbService();
+        } else {
+            $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
+        }
         $gatewayId = $this->context->cookie->paymentId;
         $cartId = $payrexxDbService->getGatewayCartId($gatewayId);
 

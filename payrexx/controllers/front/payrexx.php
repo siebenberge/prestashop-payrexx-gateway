@@ -6,6 +6,14 @@
  * @copyright  2023 Payrexx
  * @license MIT License
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+use Payrexx\PayrexxException;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxApiService;
+use Payrexx\PayrexxPaymentGateway\Service\PayrexxDbService;
+
 class PayrexxPayrexxModuleFrontController extends ModuleFrontController
 {
     private $supportedLang = ['nl', 'fr', 'de', 'it', 'nl', 'pt', 'tr', 'pl', 'es', 'dk'];
@@ -15,8 +23,13 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
     {
         try {
             // Collect Gateway data
-            $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
-            $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
+            if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
+                $payrexxDbService = new PayrexxDbService();
+                $payrexxApiService = new PayrexxApiService();
+            } else {
+                $payrexxDbService = $this->get('payrexx.payrexxpaymentgateway.payrexxdbservice');
+                $payrexxApiService = $this->get('payrexx.payrexxpaymentgateway.payrexxapiservice');
+            }
             $context = Context::getContext();
 
             $cart = $context->cart;
@@ -61,7 +74,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             );
 
             if (!$gateway) {
-                throw new \Payrexx\PayrexxException();
+                throw new PayrexxException();
             }
             $context->cookie->paymentId = $gateway->getId();
             $payrexxDbService->insertGatewayInfo(
@@ -79,7 +92,7 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             $gatewayUrl = str_replace('?', $lang . '/?', $link);
 
             Tools::redirect($gatewayUrl);
-        } catch (\Payrexx\PayrexxException $e) {
+        } catch (PayrexxException $e) {
             Tools::redirect(
                 Context::getContext()->link->getModuleLink(
                     $this->module->name,

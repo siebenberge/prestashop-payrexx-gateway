@@ -8,6 +8,10 @@
  */
 namespace Payrexx\PayrexxPaymentGateway\Config;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class PayrexxConfig
 {
     /**
