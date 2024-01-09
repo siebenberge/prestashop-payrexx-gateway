@@ -5,7 +5,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 
@@ -15,7 +15,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use Configuration;
 use Payrexx\Models\Request\SignatureCheck;
 use Payrexx\Models\Response\Gateway;
 use Payrexx\Models\Response\Transaction;
@@ -29,9 +28,9 @@ class PayrexxApiService
 
     public function __construct()
     {
-        $this->instanceName = Configuration::get('PAYREXX_INSTANCE_NAME');
-        $this->apiKey = Configuration::get('PAYREXX_API_SECRET');
-        $this->platform = Configuration::get('PAYREXX_PLATFORM');
+        $this->instanceName = \Configuration::get('PAYREXX_INSTANCE_NAME');
+        $this->apiKey = \Configuration::get('PAYREXX_API_SECRET');
+        $this->platform = \Configuration::get('PAYREXX_PLATFORM');
     }
 
     /**
@@ -160,8 +159,8 @@ class PayrexxApiService
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
 
-        if (Configuration::get('PAYREXX_LOOK_AND_FEEL_ID')) {
-            $gateway->setLookAndFeelProfile(Configuration::get('PAYREXX_LOOK_AND_FEEL_ID'));
+        if (\Configuration::get('PAYREXX_LOOK_AND_FEEL_ID')) {
+            $gateway->setLookAndFeelProfile(\Configuration::get('PAYREXX_LOOK_AND_FEEL_ID'));
         }
 
         $gateway->addField('title', '');
