@@ -3,19 +3,11 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 
 namespace Payrexx\PayrexxPaymentGateway\Service;
-
-use Cart;
-use Configuration;
-use Context;
-use Customer;
-use Db;
-use Module;
-use OrderHistory;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -50,10 +42,10 @@ class PayrexxOrderService
         $paymentMethod,
         array $extraVars = []
     ) {
-        $payrexxModule = Module::getInstanceByName('payrexx');
-        $cart = new Cart($cartId);
-        $customer = new Customer($cart->id_customer);
-        $statusId = (int) Configuration::get($prestaStatus);
+        $payrexxModule = \Module::getInstanceByName('payrexx');
+        $cart = new \Cart($cartId);
+        $customer = new \Customer($cart->id_customer);
+        $statusId = (int) \Configuration::get($prestaStatus);
 
         $payrexxModule->validateOrder(
             (int) $cart->id,
@@ -66,7 +58,7 @@ class PayrexxOrderService
             false,
             $customer->secure_key
         );
-        $context = Context::getContext();
+        $context = \Context::getContext();
         $context->cart = $cart;
     }
 
@@ -108,13 +100,13 @@ class PayrexxOrderService
     {
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:
-                return !in_array($oldStatusId, [(int) Configuration::get(self::PS_STATUS_PAYMENT), (int) Configuration::get(self::PS_STATUS_REFUND)]);
+                return !in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
             case self::PS_STATUS_REFUND:
-                return in_array($oldStatusId, [(int) Configuration::get(self::PS_STATUS_PAYMENT), (int) Configuration::get(self::PS_STATUS_REFUND)]);
+                return in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
             case self::PS_STATUS_PAYMENT:
-                return $oldStatusId !== (int) Configuration::get(self::PS_STATUS_PAYMENT);
+                return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_PAYMENT);
             case self::PS_STATUS_BANKWIRE:
-                return $oldStatusId !== (int) Configuration::get(self::PS_STATUS_BANKWIRE);
+                return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_BANKWIRE);
         }
     }
 
@@ -125,8 +117,8 @@ class PayrexxOrderService
      */
     public function updateOrderStatus($prestaStatus, $order)
     {
-        $orderHistory = new OrderHistory();
-        $prestaStatusId = Configuration::get($prestaStatus);
+        $orderHistory = new \OrderHistory();
+        $prestaStatusId = \Configuration::get($prestaStatus);
 
         $orderHistory->id_order = (int) $order->id;
         $orderHistory->changeIdOrderState($prestaStatusId, $order, true);
@@ -145,7 +137,7 @@ class PayrexxOrderService
             return 0;
         }
 
-        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+        return (int) \Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_cart = ' . (int) $id_cart);
     }

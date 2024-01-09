@@ -3,13 +3,11 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 
 namespace Payrexx\PayrexxPaymentGateway\Service;
-
-use Db;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -28,7 +26,7 @@ class PayrexxDbService
         if (empty($idCart) || empty($idGateway)) {
             return false;
         }
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
+        return \Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('
             INSERT INTO `' . _DB_PREFIX_ . 'payrexx_gateway` (`id_cart`, `id_gateway`, `pm`)
             VALUES (' . (int) $idCart . ',' . (int) $idGateway . ',\'' . $paymentMethod . '\')'
             . ' ON DUPLICATE KEY UPDATE id_gateway = ' . (int) $idGateway
@@ -46,7 +44,7 @@ class PayrexxDbService
             return null;
         }
 
-        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+        return (int) \Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_gateway FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_cart = ' . (int) $idCart
         );
@@ -61,7 +59,7 @@ class PayrexxDbService
             return null;
         }
 
-        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+        return (int) \Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT id_cart FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_gateway = ' . (int) $idGateway
         );
@@ -77,7 +75,7 @@ class PayrexxDbService
             return '';
         }
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+        return \Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
             SELECT pm FROM `' . _DB_PREFIX_ . 'payrexx_gateway`
             WHERE id_cart = ' . (int) $idCart
         );
