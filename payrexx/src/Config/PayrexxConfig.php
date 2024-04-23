@@ -23,9 +23,7 @@ class PayrexxConfig
     {
         return [
             'payrexx.com' => 'Payrexx',
-            'shop-and-pay.com' => 'Shop and Pay',
-            'ideal-pay.ch' => 'Ideal Pay',
-            'payzzter.com' => 'Payzzter',
+            'zahls.ch' => 'zahls.ch',
         ];
     }
 
