@@ -92,6 +92,7 @@ class PayrexxConfig
             'heidipay' => 'Heidipay',
             'bob-invoice' => 'Bob Invoice',
             'samsung-pay' => 'Samsung Pay',
+            'bank-transfer' => 'Purchase on Invoice',
         ];
     }
 
