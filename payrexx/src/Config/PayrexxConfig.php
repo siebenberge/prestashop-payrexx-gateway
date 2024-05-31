@@ -91,6 +91,7 @@ class PayrexxConfig
             'centi' => 'Centi',
             'heidipay' => 'Heidipay',
             'bob-invoice' => 'Bob Invoice',
+            'samsung-pay' => 'Samsung Pay',
         ];
     }
 
