@@ -448,7 +448,6 @@ class Payrexx extends PaymentModule
         $this->l('Centi');
         $this->l('Heidipay');
         $this->l('Bob Invoice');
-        $this->l('Samsung Pay');
         $this->l('Purchase on Invoice');
     }
 }
