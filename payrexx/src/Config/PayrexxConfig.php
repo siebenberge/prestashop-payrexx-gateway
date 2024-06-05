@@ -63,7 +63,7 @@ class PayrexxConfig
             'wirpay' => 'WIRpay',
             'paypal' => 'PayPal',
             'bitcoin' => 'Bitcoin',
-            'sofort' => 'Sofort Ueberweisung',
+            'klarna' => 'Klarna',
             'airplus' => 'Airplus',
             'billpay' => 'Billpay',
             'bonuscard' => 'Bonus card',

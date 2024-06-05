@@ -420,7 +420,6 @@ class Payrexx extends PaymentModule
         $this->l('WIRpay');
         $this->l('PayPal');
         $this->l('Bitcoin');
-        $this->l('Sofort Ueberweisung');
         $this->l('Airplus');
         $this->l('Billpay');
         $this->l('Bonus card');
@@ -449,5 +448,6 @@ class Payrexx extends PaymentModule
         $this->l('Heidipay');
         $this->l('Bob Invoice');
         $this->l('Purchase on Invoice');
+        $this->l('Klarna');
     }
 }
