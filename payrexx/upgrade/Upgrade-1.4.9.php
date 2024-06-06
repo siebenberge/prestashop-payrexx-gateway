@@ -12,5 +12,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_4_9($module)
 {
+    $query = 'DELETE FROM `' . _DB_PREFIX_ . 'payrexx_payment_methods` WHERE `pm` = \'sofort\'';
+    Db::getInstance()->execute($query);
     return include _PS_MODULE_DIR_ . 'payrexx/sql/install.php';
 }
