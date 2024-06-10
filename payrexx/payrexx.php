@@ -297,8 +297,8 @@ class Payrexx extends PaymentModule
                 'payrexx-payment-method-apple-pay',
                 '/modules/' . $this->name . '/views/js/applepay.js',
                 [
-                  'priority' => 996,
-                  'position' => 'bottom',
+                    'priority' => 996,
+                    'position' => 'bottom',
                 ]
             );
         }
@@ -308,17 +308,17 @@ class Payrexx extends PaymentModule
                 'payrexx-payment-method-google-pay-lib',
                 'https://pay.google.com/gp/p/js/pay.js',
                 [
-                  'priority' => 996,
-                  'server' => 'remote',
-                  'position' => 'bottom',
+                    'priority' => 996,
+                    'server' => 'remote',
+                    'position' => 'bottom',
                 ]
             );
             $this->context->controller->registerJavascript(
                 'payrexx-payment-method-google-pay',
                 '/modules/' . $this->name . '/views/js/googlepay.js',
                 [
-                  'priority' => 997,
-                  'position' => 'bottom',
+                    'priority' => 997,
+                    'position' => 'bottom',
                 ]
             );
         }

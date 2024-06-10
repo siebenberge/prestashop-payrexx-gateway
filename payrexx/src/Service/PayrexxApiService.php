@@ -36,7 +36,7 @@ class PayrexxApiService
     /**
      * @param int $gatewayId
      *
-     * @return \Payrexx\Models\Response\Gateway|null
+     * @return Gateway|null
      */
     public function getPayrexxGateway($gatewayId): ?Gateway
     {
@@ -75,7 +75,8 @@ class PayrexxApiService
 
     /**
      * @param int $transactionId
-     * @return \Payrexx\Models\Response\Transaction|null
+     *
+     * @return Transaction|null
      */
     public function getPayrexxTransaction($transactionId): ?Transaction
     {
