@@ -41,9 +41,30 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             }
 
             $customer = $context->customer;
-            $address = new Address($cart->id_address_delivery);
-            $country = Country::getIsoById($address->id_country);
 
+            $invoiceAddress = new Address($cart->id_address_invoice);
+            $deliveryAddress = new Address($cart->id_address_delivery);
+
+            $billingAddress = [
+                'firstname' => $invoiceAddress->firstname,
+                'lastname' => $invoiceAddress->lastname,
+                'company' => $invoiceAddress->company,
+                'street' => $invoiceAddress->address1 . ' ' . $invoiceAddress->address2,
+                'postcode' => $invoiceAddress->postcode,
+                'city' => $invoiceAddress->city,
+                'country' => Country::getIsoById($invoiceAddress->id_country),
+                'phone' => $invoiceAddress->phone,
+            ];
+
+            $shippingAddress = [
+                'firstname' => $deliveryAddress->firstname,
+                'lastname' => $deliveryAddress->lastname,
+                'company' => $deliveryAddress->company,
+                'street' => $deliveryAddress->address1 . ' ' . $deliveryAddress->address2,
+                'postcode' => $deliveryAddress->postcode,
+                'city' => $deliveryAddress->city,
+                'country' => Country::getIsoById($deliveryAddress->id_country),
+            ];
             $total = (float) $cart->getOrderTotal(true, Cart::BOTH);
             $currency = $context->currency->iso_code;
 
@@ -68,8 +89,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $redirectUrls,
                 $cart,
                 $customer,
-                $address,
-                $country,
+                $billingAddress,
+                $shippingAddress,
                 $pm
             );
 

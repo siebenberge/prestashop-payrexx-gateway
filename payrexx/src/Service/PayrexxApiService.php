@@ -102,8 +102,8 @@ class PayrexxApiService
         array $redirectUrls,
         $cart,
         $customer,
-        $address,
-        string $country,
+        array $billingAddress,
+        array $shippingAddress,
         array $pm
     ): ?Gateway {
         $basket = [];
@@ -168,13 +168,21 @@ class PayrexxApiService
         $gateway->addField('forename', $customer->firstname);
         $gateway->addField('surname', $customer->lastname);
         $gateway->addField('company', $customer->company);
-        $gateway->addField('street', $address->address1);
-        $gateway->addField('postcode', $address->postcode);
-        $gateway->addField('place', $address->city);
-        $gateway->addField('country', $country);
-        $gateway->addField('phone', $address->phone);
+        $gateway->addField('street', $billingAddress['street']);
+        $gateway->addField('postcode', $billingAddress['postcode']);
+        $gateway->addField('place', $billingAddress['city']);
+        $gateway->addField('country', $billingAddress['country']);
+        $gateway->addField('phone', $billingAddress['phone']);
         $gateway->addField('email', $customer->email);
         $gateway->addField('custom_field_1', $cart->id, 'Prestashop ID');
+
+        $gateway->addField('delivery_forename', $shippingAddress['firstname']);
+        $gateway->addField('delivery_surname', $shippingAddress['lastname']);
+        $gateway->addField('delivery_company', $shippingAddress['company']);
+        $gateway->addField('delivery_street', $shippingAddress['street']);
+        $gateway->addField('delivery_postcode', $shippingAddress['postcode']);
+        $gateway->addField('delivery_place', $shippingAddress['city']);
+        $gateway->addField('delivery_country', $shippingAddress['country']);
 
         try {
             return $payrexx->create($gateway);
