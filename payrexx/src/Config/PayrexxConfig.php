@@ -52,7 +52,7 @@ class PayrexxConfig
     public static function getPaymentMethods(): array
     {
         return [
-            'payrexx' => 'Payrexx payment method title',
+            'payrexx' => 'Payrexx payment methods',
             'masterpass' => 'Masterpass',
             'mastercard' => 'Mastercard',
             'visa' => 'Visa',
