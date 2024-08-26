@@ -409,7 +409,7 @@ class Payrexx extends PaymentModule
      */
     public function loadTranslationsInUi()
     {
-        $this->l('Payrexx payment methods');
+        $this->l('Payrexx Payment Methods');
         $this->l('Masterpass');
         $this->l('Mastercard');
         $this->l('Visa');
