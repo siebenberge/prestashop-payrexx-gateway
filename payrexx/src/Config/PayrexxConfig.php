@@ -53,6 +53,8 @@ class PayrexxConfig
     {
         return [
             'payrexx' => 'Payrexx Payment Methods',
+            'payrexx-pay' => 'Payrexx Pay',
+            'payrexx-pay-extended' => 'Payrexx Pay Extended',
             'masterpass' => 'Masterpass',
             'mastercard' => 'Mastercard',
             'visa' => 'Visa',

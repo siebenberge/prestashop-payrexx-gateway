@@ -82,6 +82,20 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             }
             $paymentMethod = Tools::getValue('payrexxPaymentMethod');
             $pm = ($paymentMethod != 'payrexx') ? [$paymentMethod] : [];
+
+            // Psp
+            $psp = [];
+            if (in_array($pm[0], ['payrexx-pay', 'payrexx-pay-extended'])) {
+                switch ($pm[0]) {
+                    case 'payrexx-pay':
+                        $psp = [44];
+                        break;
+                    case 'payrexx-pay-extended':
+                        $psp = [36];
+                        break;
+                }
+                $pm = [];
+            }
             $gateway = $payrexxApiService->createPayrexxGateway(
                 $purpose,
                 $total,
@@ -91,7 +105,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $customer,
                 $billingAddress,
                 $shippingAddress,
-                $pm
+                $pm,
+                $psp
             );
 
             if (!$gateway) {
