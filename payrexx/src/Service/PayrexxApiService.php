@@ -104,8 +104,7 @@ class PayrexxApiService
         $customer,
         array $billingAddress,
         array $shippingAddress,
-        array $pm,
-        array $psp
+        array $pm
     ): ?Gateway {
         $basket = [];
         $basketAmount = 0;
@@ -156,7 +155,7 @@ class PayrexxApiService
         $gateway->setSuccessRedirectUrl($redirectUrls['success']);
         $gateway->setCancelRedirectUrl($redirectUrls['cancel']);
         $gateway->setFailedRedirectUrl($redirectUrls['failed']);
-        $gateway->setPsp($psp);
+        $gateway->setPsp([]);
         $gateway->setPm($pm);
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
