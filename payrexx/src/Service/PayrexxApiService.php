@@ -116,6 +116,7 @@ class PayrexxApiService
                 'quantity' => $product['quantity'],
                 'amount' => $productPrice,
                 'sku' => $product['reference'],
+                'vatRate' => $product['rate'],
             ];
             $basketAmount += $productPrice * $product['quantity'];
         }
@@ -124,6 +125,7 @@ class PayrexxApiService
             $basket[] = [
                 'name' => 'Shipping',
                 'amount' => $shippingAmount,
+                'vatRate' => 0,
             ];
             $basketAmount += $shippingAmount;
         }
@@ -134,6 +136,7 @@ class PayrexxApiService
             $basket[] = [
                 'name' => 'Discount',
                 'amount' => -$discountAmount,
+                'vatRate' => 0,
             ];
             $basketAmount -= $discountAmount;
         }
@@ -150,7 +153,6 @@ class PayrexxApiService
         }
 
         $gateway->setAmount($total * 100);
-        $gateway->setVatRate($cart->getAverageProductsTaxRate() * 100);
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($redirectUrls['success']);
         $gateway->setCancelRedirectUrl($redirectUrls['cancel']);
