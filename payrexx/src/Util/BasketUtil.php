@@ -24,14 +24,17 @@ class BasketUtil
         // product
         foreach ($cart->getProducts() as $product) {
             $productPrice = round($product['price_wt'] * 100, 0);
-            $basket[] = [
+            $basketItem = [
                 'name' => $product['name'],
                 'description' => $product['description_short'],
                 'quantity' => $product['quantity'],
                 'amount' => $productPrice,
                 'sku' => $product['reference'],
-                'vatRate' => $product['rate'],
             ];
+            if (isset($product['rate'])) {
+                $basketItem['vatRate'] = $product['rate'];
+            }
+            $basket[] = $basketItem;
         }
 
         // shipping
