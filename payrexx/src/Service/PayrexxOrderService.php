@@ -27,6 +27,10 @@ class PayrexxOrderService
     // ID 10
     const PS_STATUS_BANKWIRE = 'PS_OS_BANKWIRE';
 
+    const PS_STATUS_SHIPPING = 'PS_OS_SHIPPING';
+
+    const PS_STATUS_DELIVERED = 'PS_OS_DELIVERED';
+
     /**
      * @param $cartId
      * @param $prestaStatus
@@ -98,13 +102,38 @@ class PayrexxOrderService
      */
     public function transitionAllowed($newStatus, $oldStatusId)
     {
+        $refundStatusId = (int) \Configuration::get(self::PS_STATUS_REFUND);
+        $newStatusId = (int) \Configuration::get($newStatus);
+        if ($oldStatusId === $newStatusId && $newStatusId !== $refundStatusId) {
+            return false;
+        }
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:
-                return !in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
+                return !in_array(
+                    $oldStatusId,
+                    [
+                        $refundStatusId,
+                        (int) \Configuration::get(self::PS_STATUS_PAYMENT),
+                        (int) \Configuration::get(self::PS_STATUS_SHIPPING),
+                        (int) \Configuration::get(self::PS_STATUS_DELIVERED),
+                    ]
+                );
             case self::PS_STATUS_REFUND:
-                return in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
+                return in_array(
+                    $oldStatusId,
+                    [
+                        (int) \Configuration::get(self::PS_STATUS_PAYMENT),
+                        $refundStatusId
+                    ]
+                );
             case self::PS_STATUS_PAYMENT:
-                return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_PAYMENT);
+                return !in_array(
+                    $oldStatusId,
+                    [
+                        (int) \Configuration::get(self::PS_STATUS_SHIPPING),
+                        (int) \Configuration::get(self::PS_STATUS_DELIVERED),
+                    ]
+                );
             case self::PS_STATUS_BANKWIRE:
                 return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_BANKWIRE);
         }
