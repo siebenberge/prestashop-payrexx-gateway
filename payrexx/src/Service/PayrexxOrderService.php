@@ -107,17 +107,18 @@ class PayrexxOrderService
         if ($oldStatusId === $newStatusId && $newStatusId !== $refundStatusId) {
             return false;
         }
+        $orderFinalStatuses = [
+            $refundStatusId,
+            (int) \Configuration::get(self::PS_STATUS_PAYMENT),
+            (int) \Configuration::get(self::PS_STATUS_SHIPPING),
+            (int) \Configuration::get(self::PS_STATUS_DELIVERED),
+            (int) \Configuration::get('PS_CHECKOUT_STATE_COMPLETED'),
+            (int) \Configuration::get('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED'),
+            (int) \Configuration::get('PS_CHECKOUT_STATE_PARTIALLY_PAID'),
+        ];
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:
-                return !in_array(
-                    $oldStatusId,
-                    [
-                        $refundStatusId,
-                        (int) \Configuration::get(self::PS_STATUS_PAYMENT),
-                        (int) \Configuration::get(self::PS_STATUS_SHIPPING),
-                        (int) \Configuration::get(self::PS_STATUS_DELIVERED),
-                    ]
-                );
+                return !in_array($oldStatusId, $orderFinalStatuses);
             case self::PS_STATUS_REFUND:
                 return in_array(
                     $oldStatusId,
