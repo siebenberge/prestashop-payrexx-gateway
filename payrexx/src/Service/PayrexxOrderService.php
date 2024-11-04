@@ -31,6 +31,12 @@ class PayrexxOrderService
 
     const PS_STATUS_DELIVERED = 'PS_OS_DELIVERED';
 
+    const PS_CHECKOUT_STATE_COMPLETED = 'PS_CHECKOUT_STATE_COMPLETED';
+ 
+    const PS_CHECKOUT_STATE_PARTIALLY_REFUNDED = 'PS_CHECKOUT_STATE_PARTIALLY_REFUNDED';
+
+    const PS_CHECKOUT_STATE_PARTIALLY_PAID = 'PS_CHECKOUT_STATE_PARTIALLY_PAID';
+
     /**
      * @param $cartId
      * @param $prestaStatus
@@ -112,9 +118,9 @@ class PayrexxOrderService
             (int) \Configuration::get(self::PS_STATUS_PAYMENT),
             (int) \Configuration::get(self::PS_STATUS_SHIPPING),
             (int) \Configuration::get(self::PS_STATUS_DELIVERED),
-            (int) \Configuration::get('PS_CHECKOUT_STATE_COMPLETED'),
-            (int) \Configuration::get('PS_CHECKOUT_STATE_PARTIALLY_REFUNDED'),
-            (int) \Configuration::get('PS_CHECKOUT_STATE_PARTIALLY_PAID'),
+            (int) \Configuration::get(self::PS_CHECKOUT_STATE_COMPLETED),
+            (int) \Configuration::get(self::PS_CHECKOUT_STATE_PARTIALLY_REFUNDED),
+            (int) \Configuration::get(self::PS_CHECKOUT_STATE_PARTIALLY_PAID),
         ];
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:

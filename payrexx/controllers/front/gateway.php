@@ -5,7 +5,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 if (!defined('_PS_VERSION_')) {
@@ -19,8 +19,24 @@ use Payrexx\PayrexxPaymentGateway\Service\PayrexxOrderService;
 
 class PayrexxGatewayModuleFrontController extends ModuleFrontController
 {
-    public function initContent()
+    /**
+     * Process post values.
+     */
+    public function postProcess()
     {
+        try {
+            $this->processWebhook();
+            echo 'Webhook processed successfully';
+        } catch(Exception $e) {
+            echo 'Webhook Error: ' . $e->getMessage();
+        }
+        exit(); // Avoid template load error.
+    }
+
+    /**
+     * Process webhook values
+     */
+    private function processWebhook() {
         if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
             $payrexxOrderService = new PayrexxOrderService();
             $payrexxDbService = new PayrexxDbService();
@@ -35,11 +51,11 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         $order = Order::getByCartId($cartId);
 
         if (!$this->validRequest($transaction, $cartId, $requestStatus)) {
-            exit;
+            return;
         }
 
         if (!$prestaStatus = $payrexxOrderService->getPrestaStatusByPayrexxStatus($requestStatus)) {
-            exit;
+            return;
         }
 
         $pm = $payrexxDbService->getPaymentMethodByCartId($cartId);
@@ -56,18 +72,18 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
                     'transaction_id' => $transaction['id'],
                 ]
             );
-            exit;
+            return;
         }
 
         if ($order->module !== $this->module->name) {
-            exit;
+            return;
         }
 
         // Update status if transition allowed
         if ($order && $payrexxOrderService->transitionAllowed($prestaStatus, $order->current_state)) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
         }
-        exit;
+        return;
     }
 
     private function validRequest($transaction, $cartId, $requestStatus): bool
