@@ -22,6 +22,7 @@ use Payrexx\PayrexxException;
 
 class PayrexxApiService
 {
+    
     private $instanceName;
     private $apiKey;
     private $platform;
@@ -104,7 +105,7 @@ class PayrexxApiService
         $customer,
         array $billingAddress,
         array $shippingAddress,
-        array $pm,
+        array $pm
     ): ?Gateway {
         $basket = [];
         $basketAmount = 0;
