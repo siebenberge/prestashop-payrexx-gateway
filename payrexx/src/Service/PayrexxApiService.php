@@ -22,7 +22,6 @@ use Payrexx\PayrexxException;
 
 class PayrexxApiService
 {
-    
     private $instanceName;
     private $apiKey;
     private $platform;
