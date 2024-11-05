@@ -27,16 +27,17 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         try {
             $this->processWebhook();
             echo 'Webhook processed successfully';
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             echo 'Webhook Error: ' . $e->getMessage();
         }
-        exit(); // Avoid template load error.
+        exit; // Avoid template load error.
     }
 
     /**
      * Process webhook values
      */
-    private function processWebhook() {
+    private function processWebhook()
+    {
         if (version_compare(_PS_VERSION_, '1.7.6', '<')) {
             $payrexxOrderService = new PayrexxOrderService();
             $payrexxDbService = new PayrexxDbService();
@@ -83,7 +84,6 @@ class PayrexxGatewayModuleFrontController extends ModuleFrontController
         if ($order && $payrexxOrderService->transitionAllowed($prestaStatus, $order->current_state)) {
             $payrexxOrderService->updateOrderStatus($prestaStatus, $order);
         }
-        return;
     }
 
     private function validRequest($transaction, $cartId, $requestStatus): bool
