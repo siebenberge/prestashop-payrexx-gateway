@@ -105,18 +105,16 @@ class PayrexxOrderService
      */
     public function transitionAllowed($newStatus, $oldStatusId)
     {
-        $partialRefundStatusId = (int) \Configuration::get(
-            self::PS_CHECKOUT_STATE_PARTIALLY_REFUNDED
-        );
         $newStatusId = (int) \Configuration::get($newStatus);
-        if ($oldStatusId === $newStatusId && $newStatusId !== $partialRefundStatusId) {
+        if ($oldStatusId === $newStatusId) {
             return false;
         }
         $orderFinalStatuses = [
-            $refundStatusId,
+            (int) \Configuration::get(self::PS_STATUS_REFUND),
             (int) \Configuration::get(self::PS_STATUS_PAYMENT),
             (int) \Configuration::get(self::PS_STATUS_SHIPPING),
             (int) \Configuration::get(self::PS_STATUS_DELIVERED),
+            (int) \Configuration::get(self::PS_CHECKOUT_STATE_PARTIALLY_REFUNDED),
         ];
 
         switch ($newStatus) {
@@ -125,17 +123,13 @@ class PayrexxOrderService
             case self::PS_STATUS_BANKWIRE:
                 return !in_array($oldStatusId, $orderFinalStatuses);
             case self::PS_STATUS_REFUND:
+            case sef::PS_CHECKOUT_STATE_PARTIALLY_REFUNDED:
                 return in_array(
                     $oldStatusId,
                     [
                         (int) \Configuration::get(self::PS_STATUS_PAYMENT),
                     ]
                 );
-            case sef::PS_CHECKOUT_STATE_PARTIALLY_REFUNDED:
-                return in_array($oldStatusId, [
-                    (int) \Configuration::get(self::PS_STATUS_PAYMENT),
-                    $partialRefundStatusId,
-                ]) && !in_array($oldStatusId, $orderFinalStatuses);
         }
         return false;
     }
