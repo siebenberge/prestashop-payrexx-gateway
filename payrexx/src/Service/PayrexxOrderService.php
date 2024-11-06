@@ -27,8 +27,10 @@ class PayrexxOrderService
     // ID 10
     const PS_STATUS_BANKWIRE = 'PS_OS_BANKWIRE';
 
+    // ID 4
     const PS_STATUS_SHIPPING = 'PS_OS_SHIPPING';
 
+    // ID 5
     const PS_STATUS_DELIVERED = 'PS_OS_DELIVERED';
 
     /**
