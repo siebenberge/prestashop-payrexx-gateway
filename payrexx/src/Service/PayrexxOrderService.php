@@ -46,7 +46,7 @@ class PayrexxOrderService
         $prestaStatus,
         $amount,
         $paymentMethod,
-        array $extraVars = []
+        array $extraVars = [],
     ) {
         $payrexxModule = \Module::getInstanceByName('payrexx');
         $cart = new \Cart($cartId);
