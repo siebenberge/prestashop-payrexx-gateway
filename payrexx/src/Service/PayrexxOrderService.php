@@ -27,6 +27,12 @@ class PayrexxOrderService
     // ID 10
     const PS_STATUS_BANKWIRE = 'PS_OS_BANKWIRE';
 
+    // ID 4
+    const PS_STATUS_SHIPPING = 'PS_OS_SHIPPING';
+
+    // ID 5
+    const PS_STATUS_DELIVERED = 'PS_OS_DELIVERED';
+
     /**
      * @param $cartId
      * @param $prestaStatus
@@ -98,16 +104,33 @@ class PayrexxOrderService
      */
     public function transitionAllowed($newStatus, $oldStatusId)
     {
+        $refundStatusId = (int) \Configuration::get(self::PS_STATUS_REFUND);
+        $newStatusId = (int) \Configuration::get($newStatus);
+        if ($oldStatusId === $newStatusId && $newStatusId !== $refundStatusId) {
+            return false;
+        }
+        $orderFinalStatuses = [
+            (int) \Configuration::get(self::PS_STATUS_REFUND),
+            (int) \Configuration::get(self::PS_STATUS_PAYMENT),
+            (int) \Configuration::get(self::PS_STATUS_SHIPPING),
+            (int) \Configuration::get(self::PS_STATUS_DELIVERED),
+        ];
+
         switch ($newStatus) {
             case self::PS_STATUS_ERROR:
-                return !in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
-            case self::PS_STATUS_REFUND:
-                return in_array($oldStatusId, [(int) \Configuration::get(self::PS_STATUS_PAYMENT), (int) \Configuration::get(self::PS_STATUS_REFUND)]);
             case self::PS_STATUS_PAYMENT:
-                return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_PAYMENT);
             case self::PS_STATUS_BANKWIRE:
-                return $oldStatusId !== (int) \Configuration::get(self::PS_STATUS_BANKWIRE);
+                return !in_array($oldStatusId, $orderFinalStatuses);
+            case self::PS_STATUS_REFUND:
+                return in_array(
+                    $oldStatusId,
+                    [
+                        (int) \Configuration::get(self::PS_STATUS_PAYMENT),
+                        (int) \Configuration::get(self::PS_STATUS_REFUND),
+                    ]
+                );
         }
+        return false;
     }
 
     /**
