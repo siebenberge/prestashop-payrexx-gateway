@@ -3,7 +3,7 @@
  * Payrexx Payment Gateway config
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2024 Payrexx
  * @license   MIT License
  */
 namespace Payrexx\PayrexxPaymentGateway\Config;
@@ -26,6 +26,7 @@ class PayrexxConfig
             'shop-and-pay.com' => 'Shop and Pay',
             'ideal-pay.ch' => 'Ideal Pay',
             'payzzter.com' => 'Payzzter',
+            'paydirect.ch' => 'Paydirect',
         ];
     }
 
