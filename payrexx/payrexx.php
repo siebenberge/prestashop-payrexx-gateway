@@ -449,5 +449,6 @@ class Payrexx extends PaymentModule
         $this->l('Purchase on Invoice');
         $this->l('Klarna');
         $this->l('Samsung Pay');
+        $this->l('Pay by Bank');
     }
 }
