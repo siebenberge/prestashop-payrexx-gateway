@@ -31,7 +31,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.5.3';
+        $this->version = '1.5.4';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = ['min' => '1.7'];
@@ -449,5 +449,6 @@ class Payrexx extends PaymentModule
         $this->l('Purchase on Invoice');
         $this->l('Klarna');
         $this->l('Samsung Pay');
+        $this->l('Pay by Bank');
     }
 }

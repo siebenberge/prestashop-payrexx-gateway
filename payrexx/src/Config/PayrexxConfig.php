@@ -93,6 +93,7 @@ class PayrexxConfig
             'bob-invoice' => 'Bob Invoice',
             'bank-transfer' => 'Purchase on Invoice',
             'samsung-pay' => 'Samsung Pay',
+            'pay-by-bank' => 'Pay by Bank',
         ];
     }
 
