@@ -26,7 +26,7 @@ class BasketUtil
             $productPrice = round($product['price_wt'] * 100, 0);
             $basketItem = [
                 'name' => $product['name'],
-                'description' => $product['description_short'],
+                'description' => strip_tags($product['description_short']),
                 'quantity' => $product['quantity'],
                 'amount' => $productPrice,
                 'sku' => $product['reference'],
