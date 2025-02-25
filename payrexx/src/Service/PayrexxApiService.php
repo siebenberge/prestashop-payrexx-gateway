@@ -130,6 +130,7 @@ class PayrexxApiService
         $gateway->setPm($pm);
         $gateway->setReferenceId($cart->id);
         $gateway->setSkipResultPage(true);
+        $gateway->setValidity(15);
 
         if (\Configuration::get('PAYREXX_LOOK_AND_FEEL_ID')) {
             $gateway->setLookAndFeelProfile(\Configuration::get('PAYREXX_LOOK_AND_FEEL_ID'));
