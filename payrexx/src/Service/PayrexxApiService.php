@@ -104,7 +104,8 @@ class PayrexxApiService
         $customer,
         array $billingAddress,
         array $shippingAddress,
-        array $pm
+        array $pm,
+        array $metaData
     ): ?Gateway {
         $basket = BasketUtil::createBasketByCart($cart);
         $basketAmount = BasketUtil::getBasketAmount($basket);
@@ -157,6 +158,7 @@ class PayrexxApiService
         $gateway->addField('delivery_country', $shippingAddress['country']);
 
         try {
+            $payrexx->setHttpHeaders($metaData);
             return $payrexx->create($gateway);
         } catch (PayrexxException $e) {
         }
