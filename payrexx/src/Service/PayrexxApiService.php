@@ -5,7 +5,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2024 Payrexx
+ * @copyright Payrexx AG
  * @license   MIT License
  */
 
