@@ -2,9 +2,9 @@
 /**
  * Payrexx FrontController
  *
- * @author Payrexx <integration@payrexx.com>
- * @copyright  2023 Payrexx
- * @license MIT License
+ * @author    Payrexx <integration@payrexx.com>
+ * @copyright Payrexx AG
+ * @license   MIT License
  */
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -73,6 +73,13 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
             }
             $paymentMethod = Tools::getValue('payrexxPaymentMethod');
             $pm = ($paymentMethod != 'payrexx') ? [$paymentMethod] : [];
+
+            $metaData['X-Shop-Version'] = (string) _PS_VERSION_;
+            $module = Module::getInstanceByName('payrexx');
+            if ($module) {
+                $metaData['X-Plugin-Version'] = (string) $module->version;
+            }
+
             $gateway = $payrexxApiService->createPayrexxGateway(
                 $total,
                 $currencyIsoCode,
@@ -81,7 +88,8 @@ class PayrexxPayrexxModuleFrontController extends ModuleFrontController
                 $customer,
                 $billingAddress,
                 $shippingAddress,
-                $pm
+                $pm,
+                $metaData
             );
 
             if (!$gateway) {
