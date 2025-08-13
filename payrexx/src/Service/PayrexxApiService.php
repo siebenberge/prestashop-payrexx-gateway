@@ -5,7 +5,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2024 Payrexx
+ * @copyright Payrexx AG
  * @license   MIT License
  */
 
@@ -104,7 +104,8 @@ class PayrexxApiService
         $customer,
         array $billingAddress,
         array $shippingAddress,
-        array $pm
+        array $pm,
+        array $metaData
     ): ?Gateway {
         $basket = BasketUtil::createBasketByCart($cart);
         $basketAmount = BasketUtil::getBasketAmount($basket);
@@ -121,7 +122,7 @@ class PayrexxApiService
             $gateway->setPurpose($purpose);
         }
 
-        $gateway->setAmount($total * 100);
+        $gateway->setAmount((int) ($total * 100));
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($redirectUrls['success']);
         $gateway->setCancelRedirectUrl($redirectUrls['cancel']);
@@ -157,6 +158,7 @@ class PayrexxApiService
         $gateway->addField('delivery_country', $shippingAddress['country']);
 
         try {
+            $payrexx->setHttpHeaders($metaData);
             return $payrexx->create($gateway);
         } catch (PayrexxException $e) {
         }

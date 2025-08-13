@@ -3,7 +3,7 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2024 Payrexx
+ * @copyright Payrexx AG
  * @license   MIT License
  */
 if (!defined('_PS_VERSION_')) {
@@ -31,10 +31,10 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.5.6';
+        $this->version = '1.6.0';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
-        $this->ps_versions_compliancy = ['min' => '1.7'];
+        $this->ps_versions_compliancy = ['min' => '8.0'];
         $this->controllers = ['payment', 'validation', 'gateway'];
         $this->bootstrap = true;
 
@@ -52,12 +52,13 @@ class Payrexx extends PaymentModule
     {
         // Install default
         if (!parent::install()
-            || !$this->installDb()
-            || !$this->registerHook('paymentOptions')
-            || !$this->registerHook('actionFrontControllerSetMedia')
+             || !$this->installDb()
+             || !$this->registerHook('paymentOptions')
+             || !$this->registerHook('actionFrontControllerSetMedia')
         ) {
             return false;
         }
+
         return true;
     }
 
@@ -69,6 +70,7 @@ class Payrexx extends PaymentModule
     private function installDb()
     {
         $installed = include dirname(__FILE__) . '/sql/install.php';
+
         return $installed;
     }
 
@@ -90,6 +92,7 @@ class Payrexx extends PaymentModule
         if (!parent::uninstall()) {
             return false;
         }
+
         return true;
     }
 
@@ -101,12 +104,17 @@ class Payrexx extends PaymentModule
     private function uninstallDb()
     {
         $unInstalled = include dirname(__FILE__) . '/sql/uninstall.php';
+
         return $unInstalled;
     }
 
     public function getContent()
     {
         $this->postProcess();
+
+        if (!$this->isRegisteredInHook('actionAdminControllerSetMedia')) {
+            $this->registerHook('actionAdminControllerSetMedia');
+        }
 
         foreach (PayrexxConfig::getPlatforms() as $url => $platformName) {
             $platforms[] = [
@@ -126,6 +134,7 @@ class Payrexx extends PaymentModule
                     'type' => 'select',
                     'label' => 'Payment Platform',
                     'name' => 'payrexx_platform',
+                    'id' => 'payrexx-platform-select',
                     'desc' => 'Choose the platform provider from the list',
                     'multiple' => false,
                     'options' => [
@@ -138,6 +147,7 @@ class Payrexx extends PaymentModule
                     'type' => 'text',
                     'label' => 'API Secret',
                     'name' => 'payrexx_api_secret',
+                    'id' => 'payrexx-api-secret-input',
                     'desc' => 'Paste here your API key from the Integrations page of your Payrexx merchant backend.',
                     'required' => true,
                 ],
@@ -145,6 +155,7 @@ class Payrexx extends PaymentModule
                     'type' => 'text',
                     'label' => 'INSTANCE NAME',
                     'name' => 'payrexx_instance_name',
+                    'id' => 'payrexx-instance-name-input',
                     'desc' => 'INSTANCE NAME is a part of the url where you access your payrexx installation.
                     https://INSTANCE.payrexx.com',
                     'required' => true,
@@ -153,12 +164,24 @@ class Payrexx extends PaymentModule
                     'type' => 'text',
                     'label' => 'Look and Feel Profile Id',
                     'name' => 'payrexx_look_and_feel_id',
+                    'id' => 'payrexx-look-and-feel-id-input',
                     'desc' => 'Enter a profile ID if you wish to use a specific Look&Feel profile.',
+                ],
+            ],
+            'buttons' => [
+                [
+                    'title' => 'Connect With Platform',
+                    'name' => 'connect_with_platform',
+                    'id' => 'connect-with-platform-button',
+                    'type' => 'button',
+                    'class' => 'btn btn-default pull-left',
+                    'js' => 'connect()',
                 ],
             ],
             'submit' => [
                 'title' => 'Save',
                 'class' => 'btn btn-default pull-right',
+                'id' => 'save-settings-button',
             ],
         ];
         foreach (PayrexxConfig::getConfigKeys() as $configKey) {
@@ -179,10 +202,10 @@ class Payrexx extends PaymentModule
             'fields_value' => $fieldsValue,
             'id_language' => $this->context->language->id,
             'back_url' => $this->context->link->getAdminLink('AdminModules')
-                . '&configure=' . $this->name
-                . '&tab_module=' . $this->tab
-                . '&module_name=' . $this->name
-                . '#paypal_params',
+                              . '&configure=' . $this->name
+                              . '&tab_module=' . $this->tab
+                              . '&module_name=' . $this->name
+                              . '#paypal_params',
         ];
         $form = $helper->generateForm($fields_form) . $this->renderAdditionalPaymentMethodsList();
 
@@ -210,7 +233,8 @@ class Payrexx extends PaymentModule
             ],
         ];
 
-        $adminLinkController = Context::getContext()->link->getAdminLink('AdminPayrexxPaymentMethods', false);
+        $adminLinkController = Context::getContext()->link->getAdminLink('AdminPayrexxPaymentMethods',
+            false);
         $token = Tools::getAdminTokenLite('AdminPayrexxPaymentMethods');
         $helperList = new HelperList();
         $helperList->table = 'payrexx_payment_methods';
@@ -234,6 +258,7 @@ class Payrexx extends PaymentModule
      * Get payment methods list.
      *
      * @param bool $filterActive
+     *
      * @return array
      */
     public function getPaymentMethodsList($filterActive = false): array
@@ -245,6 +270,7 @@ class Payrexx extends PaymentModule
             $sql->where('active = 1');
             $sql->orderBy('position');
         }
+
         return Db::getInstance()->ExecuteS($sql);
     }
 
@@ -264,6 +290,7 @@ class Payrexx extends PaymentModule
         );
         if (!$signatureCheck) {
             $this->context->controller->errors[] = 'Please enter valid credentials! Try again.';
+
             return false;
         }
         foreach (PayrexxConfig::getConfigKeys() as $configKey) {
@@ -345,7 +372,7 @@ class Payrexx extends PaymentModule
             $configPaymentMethods = PayrexxConfig::getPaymentMethods();
             $title = $configPaymentMethods[$paymentMethod['pm']];
             $imageSrc = $this->_path . 'views/img/cardicons/card_' .
-                str_replace('-', '_', $paymentMethod['pm']) . '.svg';
+                                    str_replace('-', '_', $paymentMethod['pm']) . '.svg';
 
             $paymentOption = new PaymentOption();
             $paymentOption->setAction($action);
@@ -369,7 +396,16 @@ class Payrexx extends PaymentModule
             }
             $paymentMethods[] = $paymentOption;
         }
+
         return $paymentMethods;
+    }
+
+    public function hookActionAdminControllerSetMedia(array $params)
+    {
+        // We only want to load this JS on our module's configuration page
+        if (Tools::getValue('configure') === $this->name) {
+            $this->context->controller->addJS($this->_path . 'views/js/connect.js');
+        }
     }
 
     /**
@@ -391,13 +427,14 @@ class Payrexx extends PaymentModule
             return false;
         }
         if (!empty($allowedCustomerGroups)
-            && empty(array_intersect(
-                $this->context->customer->getGroups(),
-                $allowedCustomerGroups
-            ))
+             && empty(array_intersect(
+                 $this->context->customer->getGroups(),
+                 $allowedCustomerGroups
+             ))
         ) {
             return false;
         }
+
         return true;
     }
 
@@ -450,5 +487,7 @@ class Payrexx extends PaymentModule
         $this->l('Klarna');
         $this->l('Samsung Pay');
         $this->l('Pay by Bank');
+        $this->l('Powerpay');
+        $this->l('CembraPay');
     }
 }
