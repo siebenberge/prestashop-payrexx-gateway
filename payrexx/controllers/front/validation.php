@@ -59,14 +59,14 @@ class PayrexxValidationModuleFrontController extends ModuleFrontController
     {
         switch ($payrexxError) {
             case self::ERROR_CONFIG:
-                $errMsg = 'The connection to the payment provider failed. Please contact the Shop owner';
+                $errMsg = $this->module->l('The connection to the payment provider failed. Please contact the Shop owner');
                 break;
             case self::ERROR_CANCEL:
-                $errMsg = 'The transaction was cancelled. Please try again';
+                $errMsg = $this->module->l('The transaction was cancelled. Please try again');
                 break;
             case self::ERROR_FAIL:
             default:
-                $errMsg = 'The transaction failed. Please try again';
+                $errMsg = $this->module->l('The transaction failed. Please try again');
                 break;
         }
 
