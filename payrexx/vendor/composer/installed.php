@@ -3,7 +3,7 @@
         'name' => 'payrexx/payrexxpaymentgateway',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'b80175e1d8d7e5036b6f534349df695c2e921f41',
+        'reference' => '5ca0eb17e9fefe64d89da39c32edff39d7a3cdcd',
         'type' => 'prestashop-module',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'payrexx/payrexx' => array(
-            'pretty_version' => 'v2.0.2',
-            'version' => '2.0.2.0',
-            'reference' => '88ebd2d02e1809fff7b5fa93b4a66e3ac0186e9b',
+            'pretty_version' => 'v2.0.12',
+            'version' => '2.0.12.0',
+            'reference' => '6d249753a2b0aaf4b82ea73614c1ad0498d216be',
             'type' => 'library',
             'install_path' => __DIR__ . '/../payrexx/payrexx',
             'aliases' => array(),
@@ -22,7 +22,7 @@
         'payrexx/payrexxpaymentgateway' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'b80175e1d8d7e5036b6f534349df695c2e921f41',
+            'reference' => '5ca0eb17e9fefe64d89da39c32edff39d7a3cdcd',
             'type' => 'prestashop-module',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

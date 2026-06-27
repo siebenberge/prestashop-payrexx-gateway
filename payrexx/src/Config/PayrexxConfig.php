@@ -39,6 +39,7 @@ class PayrexxConfig
             'PAYREXX_API_SECRET',
             'PAYREXX_INSTANCE_NAME',
             'PAYREXX_LOOK_AND_FEEL_ID',
+            'PAYREXX_CREATE_ORDER_BEFORE_PAYMENT',
         ];
     }
 
@@ -92,7 +93,9 @@ class PayrexxConfig
             'samsung-pay' => 'Samsung Pay',
             'pay-by-bank' => 'Pay by Bank',
             'powerpay' => 'Powerpay',
-            'cembrapay' => 'CembraPay',
+            'cembrapay' => 'Purchase on Account (CembraPay)',
+            'crypto' => 'Crypto',
+            'verd-cash' => 'VERD.cash',
         ];
     }
 

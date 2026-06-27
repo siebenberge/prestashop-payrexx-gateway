@@ -2,7 +2,7 @@
  * Payrexx Payment Gateway.
  *
  * @author    Payrexx <integration@payrexx.com>
- * @copyright 2023 Payrexx
+ * @copyright 2026 Payrexx
  * @license   MIT License
  */
 $(document).on('ready', function() {
@@ -32,13 +32,14 @@ $(document).on('ready', function() {
         );
         paymentsClient.isReadyToPay(isReadyToPayRequest).then(function(response) {
             if (!response.result) {
-                var $containerId = $('input[name=payrexxPaymentMethod][value=google-pay]')
-                    .parent('form')
-                    .parent('.js-payment-option-form')
-                    .attr('id').match(/\d+/);
-                if ($containerId > 0) {
-                    jQuery('#payment-option-' + $containerId + '-container').remove();
-                    console.warn("Payrexx Google Pay is not supported on this device/browser");
+                const $containerId = $('input[name="payrexxPaymentMethod"][value="google-pay"]')
+                .closest('.js-payment-option-form')
+                .attr('id')
+                ?.match(/\d+/)?.[0];
+
+                if ($containerId) {
+                    $(`#payment-option-${$containerId}-container`).remove();
+                    console.warn('Payrexx Google Pay is not supported on this device/browser');
                 }
             }
         }).catch(function(err) {

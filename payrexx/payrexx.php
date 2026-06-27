@@ -24,6 +24,11 @@ if (!class_exists(PayrexxConfig::class)) {
 class Payrexx extends PaymentModule
 {
     /**
+     * @var int
+     */
+    public $is_eu_compatible;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -31,7 +36,7 @@ class Payrexx extends PaymentModule
         $this->name = 'payrexx';
         $this->tab = 'payments_gateways';
         $this->module_key = '0c4dbfccbd85dd948fd9a13d5a4add90';
-        $this->version = '1.6.0';
+        $this->version = '1.6.9';
         $this->author = 'Payrexx';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = ['min' => '8.0'];
@@ -167,6 +172,27 @@ class Payrexx extends PaymentModule
                     'id' => 'payrexx-look-and-feel-id-input',
                     'desc' => 'Enter a profile ID if you wish to use a specific Look&Feel profile.',
                 ],
+                [
+                    'type' => 'switch',
+                    'label' => 'Create Order Before Payment',
+                    'name' => 'payrexx_create_order_before_payment',
+                    'id' => 'payrexx-create-order-before-payment-input',
+                    'desc' => 'If enabled, the order will be created before the payment process. 
+                        Otherwise, the order will be created after the payment confirmation.',
+                    'is_bool' => true,
+                    'values' => [
+                        [
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => 'Yes',
+                        ],
+                        [
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => 'No',
+                        ],
+                    ],
+                ],
             ],
             'buttons' => [
                 [
@@ -217,7 +243,7 @@ class Payrexx extends PaymentModule
      */
     protected function renderAdditionalPaymentMethodsList()
     {
-        $this->fieldsList = [
+        $fieldsList = [
             'active' => [
                 'title' => 'Status',
                 'active' => 'status',
@@ -251,7 +277,7 @@ class Payrexx extends PaymentModule
         $content = $this->getPaymentMethodsList(false);
         $helperList->listTotal = count($content);
 
-        return $helperList->generateList($content, $this->fieldsList);
+        return $helperList->generateList($content, $fieldsList);
     }
 
     /**
@@ -488,6 +514,8 @@ class Payrexx extends PaymentModule
         $this->l('Samsung Pay');
         $this->l('Pay by Bank');
         $this->l('Powerpay');
-        $this->l('CembraPay');
+        $this->l('Purchase on Account (CembraPay)');
+        $this->l('Crypto');
+        $this->l('VERD.cash');
     }
 }
